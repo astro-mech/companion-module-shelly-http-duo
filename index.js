@@ -160,4 +160,4 @@ class ShellyInstance extends InstanceBase {
 	pollTimer = null;
 }
 
-runEntrypoint(ShellyInstance)
+runEntrypoint(ShellyInstance, upgradeScripts)

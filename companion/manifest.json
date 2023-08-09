@@ -1,12 +1,12 @@
 {
-	"id": "shelly",
-	"name": "shelly",
+	"id": "shelly-http",
+	"name": "shelly-http",
 	"shortname": "shelly",
 	"description": "shelly",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-generic-http.git",
-	"bugs": "https://github.com/bitfocus/companion-module-generic-http/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-shelly-http.git",
+	"bugs": "https://github.com/bitfocus/companion-module-shelly-http/issues",
 	"maintainers": [
 		{
 			"name": "Leon Reucher",
@@ -23,11 +23,17 @@
 	"manufacturer": "Shelly",
 	"products": [
 		"Shelly 1",
-		"Shelly Plus 2PM",
+		"Shelly Plus 1",
+		"Shelly Plus 1PM",
+		"Shelly Plus 2PM", 
 		"Shelly 2.5",
-		"Shelly Pro 3", 
-		"Shelly Dimmer 1",
-		"Shelly Dimmer 2"
+		"Shelly Pro 1",
+		"Shelly Pro 2",
+		"Shelly Pro 2PM",
+		"Shelly Pro 3",
+		"Shelly Pro 4PM",
+		"Shelly Dimmer1/2",
+		"Shelly RGBW2"
 	],
 	"keywords": [
 		"Shelly",
