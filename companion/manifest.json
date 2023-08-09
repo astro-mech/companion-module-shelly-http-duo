@@ -1,0 +1,36 @@
+{
+	"id": "shelly",
+	"name": "shelly",
+	"shortname": "shelly",
+	"description": "shelly",
+	"version": "0.0.0",
+	"license": "MIT",
+	"repository": "git+https://github.com/bitfocus/companion-module-generic-http.git",
+	"bugs": "https://github.com/bitfocus/companion-module-generic-http/issues",
+	"maintainers": [
+		{
+			"name": "Leon Reucher",
+			"email": "leon.reucher@ultimate-technology.de"
+		}
+	],
+	"legacyIds": [],
+	"runtime": {
+		"type": "node18",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../index.js"
+	},
+	"manufacturer": "Shelly",
+	"products": [
+		"Shelly 1",
+		"Shelly Plus 2PM",
+		"Shelly 2.5",
+		"Shelly Pro 3", 
+		"Shelly Dimmer 1",
+		"Shelly Dimmer 2"
+	],
+	"keywords": [
+		"Shelly",
+		"Relay"
+	]
+}
