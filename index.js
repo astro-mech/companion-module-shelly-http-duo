@@ -62,7 +62,6 @@ class ShellyInstance extends InstanceBase {
 	init(config) {
 		this.config = config
 		ShellyMaster.targetIp = this.config.targetIp;
-		this.initPresets();
 		this.updateStatus(InstanceStatus.Ok)
 		this.initActions(this.config.shellyProduct)
 		this.initFeedbacks(this.config.shellyProduct)
@@ -122,39 +121,6 @@ class ShellyInstance extends InstanceBase {
 			case 106: this.setFeedbackDefinitions(ShellyRGBW2White.feedbacks); break;
 			default: this.setFeedbackDefinitions({});
 		}
-	}
-
-	initPresets() {
-		const presets = {};
-		presets['test'] = {
-			type: 'button',
-			category: 'Relay',
-			name: 'Test Preset',
-			style: {
-				text: 'Ch1 off',
-				size: '18',
-				color: combineRgb(255,255,255),
-				bgcolor: combineRgb(32,32,32)
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'Toggle',
-						}
-					]
-				}
-			],
-			feedbacks: [
-				{
-					feedbackId: 'Relay State',
-					style: {
-						bgcolor: combineRgb(255,32,32)
-					}
-				}
-			]
-		}
-		this.setPresetDefinitions(presets);
 	}
 
 	pollTimer = null;
