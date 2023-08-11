@@ -1,5 +1,5 @@
 {
-	"name": "shelly-relay",
+	"name": "shelly-http",
 	"version": "0.1.0",
 	"main": "index.js",
 	"type": "module",
@@ -8,7 +8,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/bitfocus/companion-module-generic-http.git"
+		"url": "git+https://github.com/bitfocus/companion-module-shelly-http.git"
 	},
 	"license": "MIT",
 	"dependencies": {
