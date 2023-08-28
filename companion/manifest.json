@@ -3,7 +3,7 @@
 	"name": "shelly-http",
 	"shortname": "shelly",
 	"description": "shelly",
-	"version": "0.0.0",
+	"version": "0.1.1",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-shelly-http.git",
 	"bugs": "https://github.com/bitfocus/companion-module-shelly-http/issues",

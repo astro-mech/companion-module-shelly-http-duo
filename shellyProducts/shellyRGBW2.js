@@ -141,21 +141,9 @@ class ShellyRGBW2Color extends ShellyMaster {
             type: 'boolean',
             name: 'Relay State',
             description: "Change the button based on the current Shelly relay state",
-            options: [
-                {
-                    type: 'checkbox',
-                    label: 'Invert',
-                    tooltip: 'If checked, this feedback gets enabled when the relay is off',
-                    id: 'invertRelayState',
-                    default: false
-                }
-            ],
+            options: [],
             callback: async (feedback, context) => {
-                var currentRelayState = this.getRelayState();
-                if (feedback.options.invertRelayState == true) {
-                    currentRelayState = !currentRelayState;
-                }
-                return currentRelayState;
+                return this.getRelayState();
             }
         },
         dimValue: {
@@ -340,22 +328,11 @@ class ShellyRGBW2White extends ShellyMaster {
                         { id: 2, label: "Channel 3" },
                         { id: 3, label: "Channel 4" },
                     ],
-                },
-                {
-                    type: 'checkbox',
-                    label: 'Invert',
-                    tooltip: 'If checked, this feedback gets enabled when the relay is off',
-                    id: 'invertRelayState',
-                    default: false
-                },
+                }
 
             ],
             callback: async (feedback, context) => {
-                var currentRelayState = this.getRelayState(feedback.options.selectedChannel);
-                if (feedback.options.invertRelayState == true) {
-                    currentRelayState = !currentRelayState;
-                }
-                return currentRelayState;
+                return this.getRelayState(feedback.options.selectedChannel);
             }
         },
         dimValue: {
