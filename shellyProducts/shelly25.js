@@ -223,21 +223,10 @@ class Shelly25Relay extends ShellyMaster {
                         { id: 0, label: "Relay 1" },
                         { id: 1, label: "Relay 2" },
                     ],
-                },
-                {
-                    type: 'checkbox',
-                    label: 'Invert',
-                    tooltip: 'If checked, this feedback gets enabled when the relay is off',
-                    id: 'invertRelayState',
-                    default: false
                 }
             ],
             callback: async (feedback, context) => {
-                var currentRelayState = this.getRelayState(feedback.options.selectedRelay);
-                if (feedback.options.invertRelayState == true) {
-                    currentRelayState = !currentRelayState;
-                }
-                return currentRelayState;
+                return this.getRelayState(feedback.options.selectedRelay);
             }
         },
         powerConsumption: {

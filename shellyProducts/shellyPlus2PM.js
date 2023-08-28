@@ -236,11 +236,7 @@ class ShellyPlus2PMRelay extends ShellyMaster {
                 }
             ],
             callback: async (feedback, context) => {
-                var currentRelayState = this.getRelayState(feedback.options.selectedRelay);
-                if (feedback.options.invertRelayState == true) {
-                    currentRelayState = !currentRelayState;
-                }
-                return currentRelayState;
+                return this.getRelayState(feedback.options.selectedRelay);
             }
         },
         powerConsumption: {
