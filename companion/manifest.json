@@ -22,13 +22,16 @@
 	},
 	"manufacturer": "Shelly",
 	"products": [
-		"Shelly 1", 
-		"Shelly 2.5",
-		"Shelly Dimmer1/2",
-		"Shelly RGBW2"
+		"1", 
+		"2.5",
+		"Dimmer1/2",
+		"RGBW2",
+		"Duo"
 	],
 	"keywords": [
 		"Shelly",
-		"Relay"
+		"Relay",
+		"Light",
+		"Duo"
 	]
 }

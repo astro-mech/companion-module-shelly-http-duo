@@ -5,7 +5,8 @@ import { Shelly1 } from './shellyProducts/shelly1.js';
 import { ShellyRGBW2Color } from './shellyProducts/shellyRGBW2.js';
 import { ShellyRGBW2White } from './shellyProducts/shellyRGBW2.js';
 import { ShellyDimmer } from './shellyProducts/shellyDimmer.js';
-import { Shelly25Relay , Shelly25Roller} from './shellyProducts/shelly25.js';
+import { Shelly25Relay, Shelly25Roller } from './shellyProducts/shelly25.js';
+import { ShellyDuo } from './shellyProducts/shellyDuo.js';
 import { ShellyMaster } from './shellyProducts/shellyMaster.js';
 
 import got from 'got'
@@ -68,6 +69,7 @@ class ShellyInstance extends InstanceBase {
 			case 104: this.setActionDefinitions(ShellyDimmer.actions); break;
 			case 105: this.setActionDefinitions(ShellyRGBW2Color.actions); break;
 			case 106: this.setActionDefinitions(ShellyRGBW2White.actions); break;
+			case 107: this.setActionDefinitions(ShellyDuo.actions); break;
 			default: this.setActionDefinitions({});
 		}
 	}
@@ -80,6 +82,7 @@ class ShellyInstance extends InstanceBase {
 			case 104: this.setFeedbackDefinitions(ShellyDimmer.feedbacks); break;
 			case 105: this.setFeedbackDefinitions(ShellyRGBW2Color.feedbacks); break;
 			case 106: this.setFeedbackDefinitions(ShellyRGBW2White.feedbacks); break;
+			case 107: this.setFeedbackDefinitions(ShellyDuo.feedbacks); break;
 			default: this.setFeedbackDefinitions({});
 		}
 	}
