@@ -1,6 +1,6 @@
 {
 	"name": "shelly-http",
-	"version": "1.0.2",
+	"version": "1.1.0.b2",
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
@@ -16,6 +16,7 @@
 		"got": "^12.6.0"
 	},
 	"devDependencies": {
-		"@companion-module/tools": "^1.2.0"
+		"@companion-module/tools": "^1.2.0",
+		"eslint": "^8.56.0"
 	}
 }

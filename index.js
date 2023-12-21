@@ -1,4 +1,4 @@
-import { InstanceBase, runEntrypoint, InstanceStatus, combineRgb } from '@companion-module/base'
+import { InstanceBase, runEntrypoint, InstanceStatus } from '@companion-module/base'
 import { configFields } from './config.js'
 import { upgradeScripts } from './upgrade.js'
 import { Shelly1 } from './shellyProducts/shelly1.js';
@@ -8,7 +8,6 @@ import { ShellyDimmer } from './shellyProducts/shellyDimmer.js';
 import { Shelly25Relay, Shelly25Roller } from './shellyProducts/shelly25.js';
 import { ShellyDuo } from './shellyProducts/shellyDuo.js';
 import { ShellyMaster } from './shellyProducts/shellyMaster.js';
-
 import got from 'got'
 
 class ShellyInstance extends InstanceBase {
@@ -18,16 +17,15 @@ class ShellyInstance extends InstanceBase {
 			this.pollTimer = setInterval(async () => {
 				try {
 					var res = await got.get("http://" + this.config.targetIp + "/status", null)
-
 					this.lastStatus = JSON.parse(res.body);
 					ShellyMaster.lastStatus = this.lastStatus;
 					this.updateStatus(InstanceStatus.Ok);
 					this.checkFeedbacks();
+					this.checkVariables();
 				}
 				catch (error) {
 					this.updateStatus(InstanceStatus.Disconnected);
 				}
-
 			}, this.config.pollingInterval)
 		}
 	}
@@ -38,6 +36,7 @@ class ShellyInstance extends InstanceBase {
 		this.initActions(this.config.shellyProduct)
 		this.initFeedbacks(this.config.shellyProduct)
 		this.subscribeFeedbacks();
+		this.initVariables(this.config.shellyProduct)
 		clearInterval(this.pollTimer);
 		this.pollTimer = null;
 		this.setupPollingInterval();
@@ -49,6 +48,7 @@ class ShellyInstance extends InstanceBase {
 		this.updateStatus(InstanceStatus.Ok)
 		this.initActions(this.config.shellyProduct)
 		this.initFeedbacks(this.config.shellyProduct)
+		this.initVariables(this.config.shellyProduct)
 		this.setupPollingInterval();
 	}
 
@@ -84,6 +84,19 @@ class ShellyInstance extends InstanceBase {
 			case 106: this.setFeedbackDefinitions(ShellyRGBW2White.feedbacks); break;
 			case 107: this.setFeedbackDefinitions(ShellyDuo.feedbacks); break;
 			default: this.setFeedbackDefinitions({});
+		}
+	}
+
+	initVariables(product) {
+		switch (product) {
+			case 107: this.setVariableDefinitions(ShellyDuo.variables()); break;
+			default: this.setVariableDefinitions([]);
+		}
+	}
+
+	checkVariables() {
+		switch (this.config.shellyProduct) {
+			case 107: ShellyDuo.updateVariables(this);
 		}
 	}
 

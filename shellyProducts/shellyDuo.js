@@ -1,34 +1,31 @@
-import got from 'got'
+import { combineRgb } from '@companion-module/base'
 import { ShellyMaster } from './shellyMaster.js';
 import { ShellyLight } from './shellyLight.js';
 import { ShellyMeter } from './shellyMeter.js';
 
-// astro-mech: new class for shelly duo
 class ShellyDuo extends ShellyMaster {
     static actions = {
-        on: {
-            name: 'Turn on',
-            options: [],
+        power: {
+            name: 'Power',
+            options: [
+                {
+                    type: 'dropdown',
+                    label: 'Power toggle/on/off',
+                    id: 'powerAction',
+                    choices: [
+                        { id: 'toggle', label: 'toggle' },
+                        { id: 'on', label: 'on' },
+                        { id: 'off', label: 'off' },
+                    ],
+                    default: 'toggle'
+                }
+            ],
             callback: async (action, context) => {
-                ShellyLight.turnOn(0);
+                ShellyLight.power(0, action.options.powerAction);
             }
         },
-        off: {
-            name: 'Turn off',
-            options: [],
-            callback: async (action, context) => {
-                ShellyLight.turnOff(0);
-            }
-        },
-        toggle: {
-            name: 'Toggle',
-            options: [],
-            callback: async (action, context) => {
-                ShellyLight.turnToggle(0);
-            }
-        },
-        setBrightness: {
-            name: 'Set brightness',
+        brightness: {
+            name: 'Brightness',
             options: [
                 {
                     type: 'number',
@@ -37,140 +34,189 @@ class ShellyDuo extends ShellyMaster {
                     min: 0,
                     max: 100,
                     default: 50,
+                    required: true,
+                    range: true
+                }
+            ],
+            callback: async (action, context) => {
+                ShellyLight.brightness(0, action.options.brightness);
+            }
+        },
+        brightnessChange: {
+            name: 'Brightness Increase/Decrease (+25 % to -25 %)',
+            options: [
+                {
+                    type: 'number',
+                    label: 'Brightness +/- n %',
+                    id: 'delta',
+                    min: -25,
+                    max: 25,
+                    default: 10,
                     required: true
                 }
             ],
             callback: async (action, context) => {
-                ShellyLight.setBrightness(0, action.options.brightness);
+                ShellyLight.brightnessChange(0, action.options.delta);
             }
         },
-        setWhite: {
-            name: 'Set white level',
+        white: {
+            name: 'White level',
             options: [
                 {
                     type: 'number',
-                    label: 'White level (0-100 %)',
+                    label: 'White Level (0-100 %)',
                     id: 'white',
                     min: 0,
                     max: 100,
                     default: 50,
+                    required: true,
+                    range: true
+                }
+            ],
+            callback: async (action, context) => {
+                ShellyLight.white(0, action.options.white);
+            }
+        },
+        whiteChange: {
+            name: 'White level Increase/Decrease (+25 % to -25 %)',
+            options: [
+                {
+                    type: 'number',
+                    label: 'White Level +/- n %',
+                    id: 'delta',
+                    min: -25,
+                    max: 25,
+                    default: 10,
                     required: true
                 }
             ],
             callback: async (action, context) => {
-                ShellyLight.setWhite(0, action.options.white);
+                ShellyLight.whiteChange(0, action.options.delta);
             }
         },
-        setTemp: {
-            name: 'Set color temperature ',
+        colorTemp: {
+            name: 'Color Temperature',
             options: [
                 {
                     type: 'number',
-                    label: 'Color temperature (2700-6500 K)',
-                    id: 'temp',
+                    label: 'Color Temperature (2700..6500 K)',
+                    id: 'colorTemp',
                     min: 2700,
                     max: 6500,
                     default: 4600,
-                    required: true
+                    required: true,
+                    range: true
                 }
             ],
             callback: async (action, context) => {
-                ShellyLight.setTemp(0, action.options.temp);
+                ShellyLight.temp(0, action.options.colorTemp);
             }
         },
-        /* does nothing !?
-        setTransition: {
-            name: 'Set transition time ',
+        colorTempChange: {
+            name: 'Color Temperature Increase/Decrease (+200 K to -200 K)',
             options: [
                 {
                     type: 'number',
-                    label: 'Transition time (0-5000 ms)',
-                    id: 'transition',
-                    min: 0,
-                    max: 5000,
-                    default: 1000,
+                    label: 'Color Temperature +/- n K',
+                    id: 'delta',
+                    min: -200,
+                    max: 200,
+                    default: 100,
                     required: true
                 }
             ],
             callback: async (action, context) => {
-                ShellyLight.setTransition(0, action.options.transition);
+                ShellyLight.tempChange(0, action.options.delta);
             }
-        }
-        */
+        },
     }
-    
+
     static feedbacks = {
-        isOn: {
+        powerStatus: {
+            type: 'advanced',
+            name: 'Power Status',
+            description: 'When light power status changes, change colors of the bank',
+            options: [
+                {
+                    type: 'dropdown',
+                    label: 'Power Status',
+                    id: 'powerStatus',
+                    choices: [
+                        { id: 'on', label: 'on' },
+                        { id: 'off', label: 'off' },
+                    ],
+                    default: 'on',
+                },
+                {
+                    type: 'colorpicker',
+                    label: 'Foreground Color',
+                    id: 'fg',
+                    default: combineRgb(0, 0, 0)
+                },
+                {
+                    type: 'colorpicker',
+                    label: 'Background Color',
+                    id: 'bg',
+                    default: combineRgb(0, 255, 0)
+                },
+            ],
+            callback: async (feedback, context) => {
+                if (ShellyLight.getPower(0) && feedback.options.powerStatus == 'on') {
+                    return { color: feedback.options.fg, bgcolor: feedback.options.bg/*, text: feedback.options.tx*/ }
+                }
+                else if (!ShellyLight.getPower(0) && feedback.options.powerStatus == 'off') {
+                    return { color: feedback.options.fg, bgcolor: feedback.options.bg/*, text: feedback.options.tx*/ }
+                }
+            }
+        },
+        power: {
             type: 'boolean',
-            name: 'Is on',
-            description: "Whether the channel is turned ON or OFF",
+            name: 'Power',
+            description: "Whether power is on or off",
             options: [],
             callback: async (feedback, context) => {
-                return ShellyLight.getIsOn(0);
+                return ShellyLight.getPower(0);
             }
         },
-        powerConsumption: {
+        light: {
             type: 'advanced',
-            name: 'Power consumption',
-            description: "Change the button text to the current power consumption",
+            name: 'Light',
+            description: "Change the button text to the current state of the light channel",
             options: [],
             callback: async (feedback, context) => {
-                const currentPowerConsumption = ShellyMeter.getPowerConsumption(0);
-                return { text: currentPowerConsumption + " W" }
+                const currentStatus = ShellyLight.getLight(0);
+                return { text: currentStatus }
             }
         },
-        totalPowerConsumption: {
+        meter: {
             type: 'advanced',
-            name: 'Total power consumption',
-            description: "Change the button text to the total power consumption",
+            name: 'Meter',
+            description: "Change the button text to the current power information",
             options: [],
             callback: async (feedback, context) => {
-                const currentTotalPowerConsumption = ShellyMeter.getTotalPowerConsumptionWh(0);
-                return { text: currentTotalPowerConsumption + " Wh" }
+                const currentMeters = ShellyMeter.getMeter(0);
+                return { text: currentMeters }
             }
         },
-        brightness: {
-            type: 'advanced',
-            name: 'Brightness',
-            description: "Change the button text to the current brightness",
-            options: [],
-            callback: async (feedback, context) => {
-                const currentBrightness = ShellyLight.getBrightness(0);
-                return { text: currentBrightness + " %" }
-            }
-        },
-        whiteLevel: {
-            type: 'advanced',
-            name: 'White level',
-            description: "Change the button text to the current white level",
-            options: [],
-            callback: async (feedback, context) => {
-                const currentWhiteLevel = ShellyLight.getWhite(0);
-                return { text: currentWhiteLevel + " %" }
-            }
-        },
-        whiteTemp: {
-            type: 'advanced',
-            name: 'Color temperature',
-            description: "Change the button text to the current color temperature",
-            options: [],
-            callback: async (feedback, context) => {
-                const currentTemp = ShellyLight.getTemp(0);
-                return { text: currentTemp + " K" }
-            }
-        },
-        /* does nothing !?
-        transition: {
-            type: 'advanced',
-            name: 'Transition time',
-            description: "Change the button text to the current transition time",
-            options: [],
-            callback: async (feedback, context) => {
-                const currentTransitionTime = ShellyLight.getTransition(0);
-                return { text: currentTransitionTime + " ms" }
-            }
-        }
-        */
+    }
+
+    static variables() {
+        var varList = [
+            { variableId: 'power', name: 'Power Status' },
+            { variableId: 'brightness', name: 'Brightness' },
+            { variableId: 'white', name: 'White Level' },
+            { variableId: 'temp', name: 'Color Temperatur' }
+        ];
+        return varList;
+    }
+
+    static updateVariables(instance) {
+        instance.setVariableValues({
+            'power': ShellyLight.getPower(0),
+            'brightness': ShellyLight.getBrightness(0),
+            'white': ShellyLight.getWhite(0),
+            'temp': ShellyLight.getTemp(0)
+        })
     }
 }
 
