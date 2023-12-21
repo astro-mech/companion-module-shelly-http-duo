@@ -37,6 +37,7 @@ class ShellyInstance extends InstanceBase {
 		this.initFeedbacks(this.config.shellyProduct)
 		this.subscribeFeedbacks();
 		this.initVariables(this.config.shellyProduct)
+		this.initPresets(this.config.shellyProduct)
 		clearInterval(this.pollTimer);
 		this.pollTimer = null;
 		this.setupPollingInterval();
@@ -49,6 +50,7 @@ class ShellyInstance extends InstanceBase {
 		this.initActions(this.config.shellyProduct)
 		this.initFeedbacks(this.config.shellyProduct)
 		this.initVariables(this.config.shellyProduct)
+		this.initPresets(this.config.shellyProduct)
 		this.setupPollingInterval();
 	}
 
@@ -98,6 +100,10 @@ class ShellyInstance extends InstanceBase {
 		switch (this.config.shellyProduct) {
 			case 107: ShellyDuo.updateVariables(this);
 		}
+	}
+
+	initPresets(product) {
+		this.setPresetDefinitions(ShellyDuo.presets())
 	}
 
 	pollTimer = null;
