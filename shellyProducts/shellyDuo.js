@@ -240,7 +240,7 @@ class ShellyDuo extends ShellyMaster {
 
 		presets['brightness'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Brightness',
 			style: {
 				text: 'Brightness\n\n$(shelly_duo_test:brightness) %',
@@ -258,7 +258,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['brightnessIncrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Brightness Increase',
 			style: {
 				text: 'Brightness\\n+',
@@ -272,7 +272,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['brightnessDecrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Brightness Decrease',
 			style: {
 				text: 'Brightness\\n-',
@@ -287,7 +287,7 @@ class ShellyDuo extends ShellyMaster {
 
 		presets['white'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'White',
 			style: {
 				text: 'White\n\n$(shelly_duo_test:white) %',
@@ -305,7 +305,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['whiteIncrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'White Increase',
 			style: {
 				text: 'White\\n+',
@@ -319,7 +319,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['whiteDecrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'White Decrease',
 			style: {
 				text: 'White\\n-',
@@ -334,7 +334,7 @@ class ShellyDuo extends ShellyMaster {
 
 		presets['colorTemp'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Color Temperatur',
 			style: {
 				text: 'Temp\n\n$(shelly_duo_test:temp) K',
@@ -352,7 +352,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['colorTempIncrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Color Temperatur Increase',
 			style: {
 				text: 'Temp\\n+',
@@ -366,7 +366,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['colorTempDecrease'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Temperatur Decrease',
 			style: {
 				text: 'Temp\\n-',
@@ -381,7 +381,7 @@ class ShellyDuo extends ShellyMaster {
 
 		presets['light'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Light',
 			style: {
 				text: 'Light',
@@ -395,7 +395,7 @@ class ShellyDuo extends ShellyMaster {
 		}
 		presets['meter'] = {
 			type: 'button',
-			category: 'General',
+			category: 'Light',
 			name: 'Meter',
 			style: {
 				text: 'Meter',

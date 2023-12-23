@@ -6,8 +6,9 @@ import { ShellyRGBW2Color } from './shellyProducts/shellyRGBW2.js';
 import { ShellyRGBW2White } from './shellyProducts/shellyRGBW2.js';
 import { ShellyDimmer } from './shellyProducts/shellyDimmer.js';
 import { Shelly25Relay, Shelly25Roller } from './shellyProducts/shelly25.js';
-import { ShellyDuo } from './shellyProducts/shellyDuo.js';
-import { ShellyMaster } from './shellyProducts/shellyMaster.js';
+import { ShellyDuo } from './shellyProducts/shellyDuo.js'
+import { ShellyDuoRGBW } from './shellyProducts/shellyDuoRGBW.js'
+import { ShellyMaster } from './shellyProducts/shellyMaster.js'
 import got from 'got'
 
 class ShellyInstance extends InstanceBase {
@@ -72,6 +73,7 @@ class ShellyInstance extends InstanceBase {
 			case 105: this.setActionDefinitions(ShellyRGBW2Color.actions); break;
 			case 106: this.setActionDefinitions(ShellyRGBW2White.actions); break;
 			case 107: this.setActionDefinitions(ShellyDuo.actions); break;
+			case 108: this.setActionDefinitions(ShellyDuoRGBW.actions); break;
 			default: this.setActionDefinitions({});
 		}
 	}
@@ -85,6 +87,7 @@ class ShellyInstance extends InstanceBase {
 			case 105: this.setFeedbackDefinitions(ShellyRGBW2Color.feedbacks); break;
 			case 106: this.setFeedbackDefinitions(ShellyRGBW2White.feedbacks); break;
 			case 107: this.setFeedbackDefinitions(ShellyDuo.feedbacks); break;
+			case 108: this.setFeedbackDefinitions(ShellyDuoRGBW.feedbacks); break;
 			default: this.setFeedbackDefinitions({});
 		}
 	}
@@ -92,6 +95,7 @@ class ShellyInstance extends InstanceBase {
 	initVariables(product) {
 		switch (product) {
 			case 107: this.setVariableDefinitions(ShellyDuo.variables()); break;
+			case 108: this.setVariableDefinitions(ShellyDuoRGBW.variables()); break;
 			default: this.setVariableDefinitions([]);
 		}
 	}
@@ -99,11 +103,15 @@ class ShellyInstance extends InstanceBase {
 	checkVariables() {
 		switch (this.config.shellyProduct) {
 			case 107: ShellyDuo.updateVariables(this);
+			case 108: ShellyDuoRGBW.updateVariables(this);
 		}
 	}
 
 	initPresets(product) {
-		this.setPresetDefinitions(ShellyDuo.presets())
+		switch (this.config.shellyProduct) {
+			case 107: this.setPresetDefinitions(ShellyDuo.presets());
+			case 108: this.setPresetDefinitions(ShellyDuo.presets());
+		}
 	}
 
 	pollTimer = null;

@@ -31,22 +31,6 @@ class ShellyLight extends ShellyMaster {
         if (this.lastStatus == null) return null;
         return this.lastStatus.lights[channelNumber].brightness;
     }
-    //White level, 0..100 %
-    static async white(channelNumber, whiteLevel) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?white=" + whiteLevel, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async whiteChange(channelNumber, delta) {
-        if (this.lastStatus == null) return false;
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?white=" + (this.lastStatus.lights[channelNumber].white + delta), null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static getWhite(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[channelNumber].white;
-    }
     //Color temperature, 2700..6500 K
     static async temp(channelNumber, temperature) {
         const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?temp=" + temperature, null)
@@ -95,6 +79,31 @@ class ShellyLight extends ShellyMaster {
             " ms"*/
         )
     }
+
+    /*
+        White Shelly bulbs
+    */
+    //White level, 0..100 %
+    static async white(channelNumber, whiteLevel) {
+        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?white=" + whiteLevel, null)
+        if (response.statusCode == 200) return true;
+        else return false;
+    }
+    static async whiteChange(channelNumber, delta) {
+        if (this.lastStatus == null) return false;
+        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?white=" + (this.lastStatus.lights[channelNumber].white + delta), null)
+        if (response.statusCode == 200) return true;
+        else return false;
+    }
+    static getWhite(channelNumber) {
+        if (this.lastStatus == null) return null;
+        return this.lastStatus.lights[channelNumber].white;
+    }
+
+    /*
+        Color Shelly bulbs
+    */
+
 }
 
 export { ShellyLight };
