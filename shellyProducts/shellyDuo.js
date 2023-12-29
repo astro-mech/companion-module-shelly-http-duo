@@ -1,188 +1,325 @@
-import { combineRgb } from '@companion-module/base'
-import { ShellyMaster } from './shellyMaster.js';
-import { ShellyLight } from './shellyLight.js';
-import { ShellyMeter } from './shellyMeter.js';
+import { ShellyLight, Colors } from './shellyLight.js'
 
-class ShellyDuo extends ShellyMaster {
-    static actions = {
-        power: {
-            name: 'Power',
-            options: [
-                {
-                    type: 'dropdown',
-                    label: 'Power toggle/on/off',
-                    id: 'powerAction',
-                    choices: [
-                        { id: 'toggle', label: 'toggle' },
-                        { id: 'on', label: 'on' },
-                        { id: 'off', label: 'off' },
-                    ],
-                    default: 'toggle'
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.power(0, action.options.powerAction);
-            }
-        },
-        brightness: {
-            name: 'Brightness',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Brightness (0-100 %)',
-                    id: 'brightness',
-                    min: 0,
-                    max: 100,
-                    default: 50,
-                    required: true,
-                    range: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.brightness(0, action.options.brightness);
-            }
-        },
-        brightnessChange: {
-            name: 'Brightness Increase/Decrease (+25 % to -25 %)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Brightness +/- n %',
-                    id: 'delta',
-                    min: -25,
-                    max: 25,
-                    default: 10,
-                    required: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.brightnessChange(0, action.options.delta);
-            }
-        },
-        white: {
-            name: 'White level',
-            options: [
-                {
-                    type: 'number',
-                    label: 'White Level (0-100 %)',
-                    id: 'white',
-                    min: 0,
-                    max: 100,
-                    default: 50,
-                    required: true,
-                    range: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.white(0, action.options.white);
-            }
-        },
-        whiteChange: {
-            name: 'White level Increase/Decrease (+25 % to -25 %)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'White Level +/- n %',
-                    id: 'delta',
-                    min: -25,
-                    max: 25,
-                    default: 10,
-                    required: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.whiteChange(0, action.options.delta);
-            }
-        },
-        colorTemp: {
-            name: 'Color Temperature',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Temperature (2700..6500 K)',
-                    id: 'colorTemp',
-                    min: 2700,
-                    max: 6500,
-                    default: 4600,
-                    required: true,
-                    range: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.temp(0, action.options.colorTemp);
-            }
-        },
-        colorTempChange: {
-            name: 'Color Temperature Increase/Decrease (+200 K to -200 K)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Temperature +/- n K',
-                    id: 'delta',
-                    min: -200,
-                    max: 200,
-                    default: 100,
-                    required: true
-                }
-            ],
-            callback: async (action, context) => {
-                ShellyLight.tempChange(0, action.options.delta);
-            }
-        },
-    }
+export const POWER_VALUES = ['off', 'on']
+export const POWER_ACTIONS = ['off', 'on', 'toggle']
 
-    static feedbacks = {
+export var Options = {
+	selectPower:  {
+		type: 'dropdown',
+		label: 'Power Status',
+		id: 'power',
+		default: 'on',
+		choices: POWER_VALUES.map((label) => ({ id: label, label })),
+	},
+	selectPowerAction:  {
+		type: 'dropdown',
+		label: 'Power Action',
+		id: 'powerAction',
+		default: POWER_ACTIONS[2],
+		choices: POWER_ACTIONS.map((label) => ({ id: label, label })),
+	},
+	foregroundColor:  {
+		type: 'colorpicker',
+		label: 'Foreground color',
+		id: 'fg',
+		default: Colors.white,
+	},
+	backgroundColor:  {
+		type: 'colorpicker',
+		label: 'Background color',
+		id: 'bg',
+		default: Colors.green,
+	},
+	selectBrightness:  {
+		type: 'number',
+		label: 'Brightness [%]',
+		id: 'brightness',
+		min: 0,
+		max: 100,
+		default: 50,
+		required: true,
+		range: true
+	},
+	selectBrightnessDelta:  {
+		type: 'number',
+		label: 'Brightness Delta [%]',
+		id: 'brightnessDelta',
+		min: -25,
+		max: 25,
+		default: 5,
+		required: true,
+		range: true
+	},
+	selectColorTemperature2700: {
+		type: 'number',
+		label: 'Color Temperature [K]',
+		id: 'colorTemperature',
+		min: 2700,
+		max: 6500,
+		default: 4000,
+		required: true,
+		range: true
+	},
+	selectColorTemperatureDelta:  {
+		type: 'number',
+		label: 'Color Temperature Delta [K]',
+		id: 'colorTempDelta',
+		min: -200,
+		max: 200,
+		default: 100,
+		required: true,
+		range: true
+	},
+/*	selectWhite100: {
+		type: 'number',
+		label: 'White [%]',
+		id: 'white',
+		min: 0,
+		max: 100,
+		default: 50,
+		required: true,
+		range: true
+	},
+	selectWhite255: {
+		type: 'number',
+		label: 'White',
+		id: 'white',
+		min: 0,
+		max: 255,
+		default: 127,
+		required: true,
+		range: true
+	},
+	selectWhiteDelta: {
+		type: 'number',
+		label: 'White Delta [%]',
+		id: 'whiteDelta',
+		min: -25,
+		max: 25,
+		default: 5,
+		required: true,
+		range: true
+	},
+*/
+	selectBrightnessLowFg: {
+		type: 'colorpicker',
+		label: 'Foreground Color Brightness Level Low < 25 %',
+		id: 'fgLowBrightness',
+		default: Colors.white,
+	},
+	selectBrightnessLowBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Brightness Level Low < 25 %',
+		id: 'bgLowBrightness',
+		default: 0x222222,
+	},
+	selectBrightnessMiddleFg:  {
+		type: 'colorpicker',
+		label: 'Foreground Color Brightness Level Middle < 25 %',
+		id: 'fgMiddleBrightness',
+		default: Colors.white,
+	},
+	selectBrightnessMiddleBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Brightness Level Middle < 25 %',
+		id: 'bgMiddleBrightness',
+		default: 0x999999,
+	},
+	selectBrightnessHighFg:  {
+		type: 'colorpicker',
+		label: 'Foreground Color Brightness Level High < 25 %',
+		id: 'fgHighBrightness',
+		default: Colors.black,
+	},
+	selectBrightnessHighBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Brightness Level High < 25 %',
+		id: 'bgHighBrightness',
+		default: 0xdddddd,
+	},
+	colorTempWarmWhiteFg:  {
+		type: 'colorpicker',
+		label: 'Foreground Color Warm White < 3300 K',
+		id: 'fgWarmWhite',
+		default: Colors.black,
+	},
+	colorTempWarmWhiteBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Warm White < 3300 K',
+		id: 'bgWarmWhite',
+		default: Colors.warmWhite, //combineRgb(255, 204, 26), //red 100%, green 80%, blue 10%.
+	},
+	colorTempNeutralWhiteFg:  {
+		type: 'colorpicker',
+		label: 'Foreground Color Neutral White 3300 - 5300 K',
+		id: 'fgNeutralWhite',
+		default: Colors.black,
+	},
+	colorTempNeutralWhiteBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Neutral White 3300 - 5300 K',
+		id: 'bgNeutralWhite',
+		default: Colors.neutralWhite,
+	},
+	colorTempColdWhiteFg:  {
+		type: 'colorpicker',
+		label: 'Foreground Color Cold White > 5300 K',
+		id: 'fgColdWhite',
+		default: Colors.black,
+	},
+	colorTempColdWhiteBg:  {
+		type: 'colorpicker',
+		label: 'Background Color Cold White > 5300 K',
+		id: 'bgColdWhite',
+		default: Colors.coldWhite,
+	},
+}
+
+export class ShellyDuo extends ShellyLight {
+	static powerValue(powerState) {
+		return POWER_VALUES[(powerState == true) ? 1 : 0]
+	}
+
+	static actions = {
 		power: {
-            type: 'boolean',
-            name: 'Power On',
-            description: "Whether power is on or off",
-            options: [],
-            callback: async (feedback, context) => {
-                return ShellyLight.getPower(0);
-            }
-        },
-        light: {
-            type: 'advanced',
-            name: 'Light',
-            description: "Change the button text to the current state of the light channel",
-            options: [],
-            callback: async (feedback, context) => {
-                const currentStatus = ShellyLight.getLight(0);
-                return { text: currentStatus }
-            }
-        },
-		meter: {
-			type: 'advanced',
-			name: 'Meter',
-			description: "Change the button text to the current power information",
-			options: [],
-			callback: async (feedback, context) => {
-				const currentMeters = ShellyMeter.getMeter(0);
-				return { text: currentMeters }
+			name: 'Power',
+			options: [Options.selectPowerAction],
+			callback: async (action, context) => {
+				this.setPowerState(0, action.options.powerAction)
 			}
 		},
-    }
+		brightness: {
+			name: 'Brightness',
+			options: [Options.selectBrightness],
+			callback: async (action, context) => {
+				this.setWhiteBrightness(0, action.options.brightness);
+			},
+			learn: (action) => {
+				return {
+					brightness: this.getBrightness(0)
+				}
+			}
+		},
+		brightnessChange: {
+			name: 'Increase/Decrease Brightness',
+			options: [Options.selectBrightnessDelta],
+			callback: async (action, context) => {
+				this.changeWhiteBrightness(0, action.options.brightnessDelta);
+			}
+		},
+		colorTemperature: {
+			name: 'Color Temperature',
+			options: [Options.selectColorTemperature2700],
+			callback: async (action, context) => {
+				this.setColorTemperature(0, action.options.colorTemperature)
+			},
+			learn: (action) => {
+				return {
+					colorTemperature: this.getColorTemperature(0)
+				}
+			}
+		},
+		colorTemperatureChange: {
+			name: 'Increase/Decrease Color Temperature',
+			options: [Options.selectColorTemperatureDelta],
+			callback: async (action, context) => {
+				this.changeColorTemperature(0, action.options.delta, 2700, 6500)
+			}
+		},
+		light: {
+			name: 'Light',
+			options: [Options.selectPower, Options.selectColorTemperature2700, Options.selectBrightness],
+			callback: async (action, context) => {
+				this.setWhiteLight(0, action.options.power, action.options.colorTemperature, action.options.brightness);
+			},
+			learn: (action) => {
+				const light = this.getWhiteLight(0);
+				return {
+					power: light.power,
+					colorTemperature: light.colorTemperature,
+					brightness: light.brightness,
+				}
+			}
+		},
+	}
+	static feedbacks = {
+		power: {
+			type: 'advanced',
+			name: 'Power Status',
+			description: 'When light power status changes, change colors of the bank',
+			options: [Options.selectPower, Options.foregroundColor, Options.backgroundColor],
+			callback: (feedback, context) => {
+				//console.log(feedback.options.power + " / " + this.getPowerState(0) + " / " + this.powerValue(this.getPowerState(0)));
+				if (feedback.options.power == this.powerValue(this.getPowerState(0))) {
+					return { color: feedback.options.fg, bgcolor: feedback.options.bg }
+				}
+			}
+		},
+		brightness: {
+			type: 'advanced',
+			name: 'Brightness',
+			description: 'When brightness changes, change colors of the bank',
+			options: [
+				Options.selectBrightnessLowFg, Options.selectBrightnessLowBg,
+				Options.selectBrightnessMiddleFg, Options.selectBrightnessMiddleBg,
+				Options.selectBrightnessHighFg, Options.selectBrightnessHighBg],
+			callback: (feedback, context) => {
+				if (this.getWhiteBrightness(0) < 25) {
+					return { color: feedback.options.fgLowBrightness, bgcolor: feedback.options.bgLowBrightness }
+				} else if (this.getWhiteBrightness(0) > 75) {
+					return { color: feedback.options.fgHighBrightness, bgcolor: feedback.options.bgHighBrightness }
+				} else {
+					return { color: feedback.options.fgMiddleBrightness, bgcolor: feedback.options.bgMiddleBrightness }
+				}
+			}
+		},
+		colorTemperature: {
+			type: 'advanced',
+			name: 'Color Temperature',
+			description: 'When Color Temperature changes, change colors of the bank',
+			options: [
+				Options.colorTempWarmWhiteFg, Options.colorTempWarmWhiteBg,
+				Options.colorTempNeutralWhiteFg, Options.colorTempNeutralWhiteBg,
+				Options.colorTempColdWhiteFg, Options.colorTempColdWhiteBg],
+			callback: (feedback, context) => {
+				if (this.getColorTemperature(0) < 3300) {
+					return { color: feedback.options.fgWarmWhite, bgcolor: feedback.options.bgWarmWhite }
+				} else if (this.getColorTemperature(0) > 5300) {
+					return { color: feedback.options.fgColdWhite, bgcolor: feedback.options.bgColdWhite }
+				} else {
+					return { color: feedback.options.fgNeutralWhite, bgcolor: feedback.options.bgNeutralWhite }
+				}
+			}
+		},
+	}
+	static variables() {
+		let varList = [
+			{ variableId: 'power', name: 'Power Status' },
+			{ variableId: 'powerConsumption', name: 'Power Consumption' },
+			{ variableId: 'totalPowerConsumption', name: 'Total Power Consumption' },
+			{ variableId: 'brightness', name: 'Brightness' },
+			{ variableId: 'colorTemperature', name: 'Color Temperature' },
+			{ variableId: 'light', name: 'Light' },
+		];
+		return varList;
+	}
+	static lightText(light) {
+		//console.log(light.power + ' / ' + light.colorTemperature + ' / ' + light.brightness);
+		return light.power + ', ' + light.colorTemperature + ' K, ' + light.brightness + ' %';
+	}
+	static updateVariables(instance) {
+		instance.setVariableValues({
+			'power': this.powerValue(this.getPowerState(0)),
+			'powerConsumption': this.getPowerConsumption(0),
+			'totalPowerConsumption': this.getTotalPowerConsumption(0),
+			'brightness': this.getWhiteBrightness(0),
+			'colorTemperature': this.getColorTemperature(0),
+			'light': this.lightText(this.getWhiteLight(0)),
+		})
+	}
 
-    static variables() {
-        let varList = [
-            { variableId: 'power', name: 'Power On' },
-            { variableId: 'brightness', name: 'Brightness' },
-            { variableId: 'white', name: 'White Level' },
-            { variableId: 'temp', name: 'Color Temperatur' }
-        ];
-        return varList;
-    }
 
-    static updateVariables(instance) {
-        instance.setVariableValues({
-            'power': ShellyLight.getPower(0),
-            'brightness': ShellyLight.getBrightness(0),
-            'white': ShellyLight.getWhite(0),
-            'temp': ShellyLight.getTemp(0)
-        })
-    }
-	
-	static presets() {
+/*	static presets() {
 		let presets = {}
 
 		const ColorWhite = combineRgb(255, 255, 255)
@@ -410,8 +547,6 @@ class ShellyDuo extends ShellyMaster {
 
 	return presets
 }
-
+*/
 
 }
-
-export { ShellyDuo };

@@ -1,346 +1,218 @@
 import got from 'got';
-import { combineRgb } from '@companion-module/base'
-import { ShellyMaster } from './shellyMaster.js'
-import { ShellyDuo } from './shellyDuo.js'
+import { combineRgb } from '@companion-module/base';
+import { ShellyDuo, Options  } from './ShellyDuo.js'
 
-const ColorWhite = combineRgb(255, 255, 255)
-const ColorBlack = combineRgb(0, 0, 0)
-const ColorRed = combineRgb(255, 0, 0)          //STOP,HALT,BREAK,KILL and similar terminating functions + Active program on switchers
-const ColorGreen = combineRgb(0, 204, 0)        //TAKE,GO,PLAY, and similar starting functions. + Active Preview on switchers
-const ColorYellow = combineRgb(255, 255, 0)     //PAUSE,HOLD,WAIT and similar holding functions + active Keyer on switchers
-const ColorBlue = combineRgb(0, 51, 204)        //Active AUX on switchers
-const ColorPurple = combineRgb(255, 0, 255)     //Presets that need user configuration after they have been draged onto a button
 
-export class ShellyCommon extends ShellyMaster {
-    /*  Attributes:
-        ison 	    bool 	Whether the channel is turned ON or OFF
-        power       number 	Consumed power, W
-        total       number 	Total energy consumed in Watt-minute
-        overpower 	bool 	Whether an overpower condition has occured
-        source 	    string 	Source of the last command
-    */
+/*export class ShellyColor extends ShellyLight {
+    *//*  Attributes:
+    *//*
 
-    static getRelayState(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[0].ison;
-    }
-    static getPowerConsumption(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.meters[0].power;
-    }
-    static getTotalPowerConsumption(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return (this.lastStatus.meters[0].total / 60).toFixed(2);
-    }
-    static getOverPowerState(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.meters[0].overpower;
-    }
 
-    static async setRelayState(channelNumber, action) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?turn=" + action, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-}
-export class ShellyWhite extends ShellyCommon {
-    /*  Attributes:
-        brightness 	number 	Brightness, 0..100
-        temp 	    number 	Color temperature, 2700/3000..6500K
-    */
 
-    static getBrightness(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[0].brightness;
-    }
-    static getTemp(channelNumber) {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[channelNumber].temp;
-    }
-
-    static async setBrightness(channelNumber, brightness) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?brightness=" + brightness, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async changeBrightness(channelNumber, delta) {
-        if (this.lastStatus == null) return false;
-        let newBrightness = Math.max(Math.min(this.lastStatus.lights[channelNumber].brightness + delta, 100), 0);
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?brightness=" + newBrightness, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async setTemp(channelNumber, temp) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?temp=" + temp, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async changeTemp(channelNumber, delta, minTemp, maxTemp) {
-        if (this.lastStatus == null) return false;
-        let newTemp = Math.max(Math.min(this.lastStatus.lights[channelNumber].temp + delta, maxTemp), minTemp);
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?temp=" + newTemp, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-
-}
-export class ShellyColor extends ShellyWhite {
-    /*  Attributes:
-        mode 	string 	Currently configured mode
-        red 	number 	Red brightness, 0..255, applies in mode="color"
-        green 	number 	Green brightness, 0..255, applies in mode="color"
-        blue 	number 	Blue brightness, 0..255, applies in mode="color"
-        white 	number 	White brightness, 0..255, applies in mode="color"
-        gain 	number 	Gain for all channels, 0..100, applies in mode="color"
-        effect 	number 	Currently applied effect, description
-    */
-
-    static getMode() {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[0].mode;
-    }
-    static getColorBrightness() {
-        if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[0].gain;
-    }
-    static getColor() {
-        if (this.lastStatus == null) return null;
-        return {
-            red: this.lastStatus.lights[0].red,
-            green: this.lastStatus.lights[0].green,
-            blue: this.lastStatus.lights[0].blue,
-            white: this.lastStatus.lights[0].white,
-        }
-    }
     static getEffect() {
         if (this.lastStatus == null) return null;
         return this.lastStatus.lights[0].effect;
     }
 
-    static async setMode(mode) {
-        const response = await got.get("http://" + this.targetIp + "/light/0?mode=" + mode, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async setColorBrightness(gain) {
-        const response = await got.get("http://" + this.targetIp + "/light/0?gain=" + gain, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async changeColorBrightness(delta) {
-        if (this.lastStatus == null) return false;
-        const newGain = Math.max(Math.min(this.lastStatus.lights[0].gain + delta, 100), 0);
-        const response = await got.get("http://" + this.targetIp + "/light/0?gain=" + newGain, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async setColor(red, green, blue, white, gain) {
-        const response = await got.get("http://" + this.targetIp + "/color/0?red=" + red + "&green=" + green + "&blue=" + blue + "&white=" + white + "&gain=" + gain, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
-    static async changeColor(deltaRed, deltaGreen, deltaBlue, deltaWhite, deltaGain) {
-        if (this.lastStatus == null) return false;
-        const red = Math.max(Math.min(this.lastStatus.lights[0].red + deltaRed, 255), 0);
-        const green = Math.max(Math.min(this.lastStatus.lights[0].green + deltaGreen, 255), 0);
-        const blue = Math.max(Math.min(this.lastStatus.lights[0].blue + deltaBlue, 255), 0);
-        const white = Math.max(Math.min(this.lastStatus.lights[0].white + deltaWhite, 255), 0);
-        const gain = Math.max(Math.min(this.lastStatus.lights[0].gain + deltaGain, 100), 0);
-        const response = await got.get("http://" + this.targetIp + "/color/0?red=" + red + "&green=" + green + "&blue=" + blue + "&white=" + white + "&gain=" + gain, null)
-        if (response.statusCode == 200) return true;
-        else return false;
-    }
+    
     static async setEffect(effect) {
         const response = await got.get("http://" + this.targetIp + "/light/0?effect=" + effect, null)
         if (response.statusCode == 200) return true;
         else return false;
     }
 }
+*/
 
-/*const POWER_VALUES = ['OFF', 'ON']
-const selectPower = {
+const MODE_VALUES = ['white', 'color', 'current']
+const MODE_SELECTION = ['white', 'color', 'toggle']
+const MODE_ACTIONS = ['white', 'color', 'current', 'all', 'preselected']
+const MODE_FEEDBACK_ACTIONS = ['white', 'color', 'current', 'preselected']
+let preselectedMode = 'current'
+Options.selectMode = {
     type: 'dropdown',
-    label: 'Power status',
-    id: 'power',
-    default: 1,
-    choices: POWER_VALUES.map((label, index) => ({ id: index, label })),
+    label: 'Mode',
+    id: 'mode',
+    default: MODE_VALUES[1],
+    choices: MODE_VALUES.map((label) => ({ id: label, label })),
 }
-const foregroundColor = {
-    type: 'colorpicker',
-    label: 'Foreground color',
-    id: 'fg',
-    default: ColorWhite,
+Options.selectSetMode = {
+    type: 'dropdown',
+    label: 'Mode',
+    id: 'mode',
+    default: MODE_SELECTION[1],
+    choices: MODE_SELECTION.map((label) => ({ id: label, label })),
 }
-const backgroundColor = {
-    type: 'colorpicker',
-    label: 'Background color',
-    id: 'bg',
-    default: ColorGreen,
+Options.selectModeAction = {
+    type: 'dropdown',
+    label: 'Mode',
+    id: 'mode',
+    default: MODE_ACTIONS[2],
+    choices: MODE_ACTIONS.map((label) => ({ id: label, label })),
 }
-*/class ShellyDuoRGBW extends ShellyColor {
-
-    static actions = {
-        setPower: {
-            name: 'Power',
-            options: [
-                {
-                    type: 'dropdown',
-                    label: 'Power toggle/on/off',
-                    id: 'powerAction',
-                    choices: [
-                        { id: 'toggle', label: 'toggle' },
-                        { id: 'on', label: 'on' },
-                        { id: 'off', label: 'off' },
-                    ],
-                    default: 'toggle'
-                }
-            ],
-            callback: async (action, context) => {
-                this.setRelayState(0, action.options.powerAction)
-            }
-        },
-
-        setBrightness: {
-            name: 'Set Brightness',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Brightness (0-100 %)',
-                    id: 'brightness',
-                    min: 0,
-                    max: 100,
-                    default: 50,
-                    required: true,
-                    range: true
-                }
-            ],
-            callback: async (action, context) => {
-                this.setBrightness(0, action.options.brightness)
-            },
-            learn: (action) => {
-                return {
-                    brightness: this.lastStatus.lights[0].brightness
-                }
-            }
-        },
-        changeBrightness: {
-            name: 'Increase/Decrease Brightness (+25 % to -25 %)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Brightness +/- n %',
-                    id: 'delta',
-                    min: -25,
-                    max: 25,
-                    default: 10,
-                    required: true
-                }
-            ],
-            callback: async (action, context) => {
-                this.changeBrightness(0, action.options.delta)
-            }
-        },
-        setTemp: {
-            name: 'Set Color Temperature',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Temperature (3000..6500 K)',
-                    id: 'temp',
-                    min: 3000,
+Options.selectModeFeedbackAction = {
+    type: 'dropdown',
+    label: 'Mode',
+    id: 'mode',
+    default: MODE_FEEDBACK_ACTIONS[2],
+    choices: MODE_FEEDBACK_ACTIONS.map((label) => ({ id: label, label })),
+}
+Options.selectColorTemperature3000 = {
+    type: 'number',
+        label: 'Color Temperature [K]',
+            id: 'colorTemperature',
+                min: 3000,
                     max: 6500,
-                    default: 4750,
-                    required: true,
-                    range: true
-                }
-            ],
-            callback: async (action, context) => {
-                this.setTemp(action.options.temp)
-            },
-            learn: (action) => {
-                return {
-                    temp: this.lastStatus.lights[0].temp
-                }
-            }
-        },
-        changeTemp: {
-            name: 'Increase/Decrease Color Temperature (+200 K to -200 K)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Temperature +/- n K',
-                    id: 'delta',
-                    min: -200,
-                    max: 200,
-                    default: 100,
-                    required: true
-                }
-            ],
-            callback: async (action, context) => {
-                this.changeTemp(0, action.options.delta, 3000, 6500)
-            }
-        },
+		default: 4000,
+        required: true,
+            range: true
+},
+Options.selectRed = {
+    type: 'number',
+    label: 'Red Channel level',
+    id: 'red',
+    min: 0,
+    max: 255,
+	default: 128,
+    required: true,
+    range: true,
+}
+Options.selectGreen = {
+    type: 'number',
+    label: 'Green Channel level',
+    id: 'green',
+    min: 0,
+    max: 255,
+    default: 128,
+    required: true,
+    range: true,
+}
+Options.selectBlue = {
+    type: 'number',
+    label: 'Blue Channel level',
+    id: 'blue',
+    min: 0,
+    max: 255,
+    default: 128,
+    required: true,
+    range: true,
+}
+Options.selectWhite = {
+    type: 'number',
+    label: 'White Channel level',
+    id: 'white',
+    min: 0,
+    max: 255,
+    default: 128,
+    required: true,
+    range: true,
+}
 
-        setMode: {
-            name: 'Set Mode',
-            options: [
-                {
-                    type: 'dropdown',
-                    label: 'Mode',
-                    id: 'mode',
-                    choices: [
-                        { id: 'white', label: 'white' },
-                        { id: 'color', label: 'color' },
-                    ],
-                    default: 'white'
-                }
-            ],
+export class ShellyDuoRGBW extends ShellyDuo {
+    
+    static duoRgbwActions = {
+        mode: {
+            name: 'Mode',
+            options: [Options.selectSetMode],
             callback: async (action, context) => {
-                this.setMode(action.options.mode)
+                this.setColorMode(0, action.options.mode)
             }
         },
-        setColorBrightness: {
-            name: 'Set Color Brightness',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Brightness (0-100 %)',
-                    id: 'gain',
-                    min: 0,
-                    max: 100,
-                    default: 50,
-                    required: true,
-                    range: true
-                }
-            ],
+        preselectedMode: {
+            name: 'Preselected Mode',
+            options: [Options.selectModeAction],
             callback: async (action, context) => {
-                this.setColorBrightness(action.options.gain)
+                if (action.options.mode != 'preselected')
+                    preselectedMode = action.options.mode
+            }
+        },
+        brightness: {
+            name: 'Brightness',
+            options: [Options.selectModeAction, Options.selectBrightness],
+            callback: async (action, context) => {
+                let newMode = action.options.mode;
+                if (action.options.mode == 'preselected') newMode = preselectedMode;
+                switch (newMode) {
+                    case 'white': this.setWhiteBrightness(0, action.options.brightness); break;
+                    case 'color': this.setColorBrightness(0, action.options.brightness); break;
+                    case 'current': this.setBrightness(0, action.options.brightness); break;
+                    default:
+                        this.setWhiteBrightness(0, action.options.brightness);
+                        this.setColorBrightness(0, action.options.brightness);
+                }
             },
             learn: (action) => {
                 return {
-                    gain: this.lastStatus.lights[0].gain
+                    brightness: this.getBrightness(0)
                 }
             }
         },
-        changeColorBrightness: {
-            name: 'Increase/Decrease Color Brightness (+25 % to -25 %)',
-            options: [
-                {
-                    type: 'number',
-                    label: 'Color Brightness +/- n %',
-                    id: 'delta',
-                    min: -25,
-                    max: 25,
-                    default: 10,
-                    required: true
+        brightnessChange: {
+            name: 'Increase/Decrease Brightness',
+            options: [Options.selectModeAction, Options.selectBrightnessDelta],
+            callback: async (action, context) => {
+                let newMode = action.options.mode;
+                if (action.options.mode == 'preselected') newMode = (preselectedMode == 'white' ? 'white' : 'color');
+                switch (newMode) {
+                    case 'white': this.changeWhiteBrightness(0, action.options.brightnessDelta); break;
+                    case 'color': this.changeColorBrightness(0, action.options.brightnessDelta); break;
+                    case 'current': this.changeBrightness(0, action.options.brightnessDelta); break;
+                    default:
+                        this.changeWhiteBrightness(0, action.options.brightnessDelta);
+                        this.changeColorBrightness(0, action.options.brightnessDelta);
                 }
+            }
+        },
+        light: {
+            name: 'Light',
+            options: [
+                Options.selectPower,
+                Options.selectMode,
+                Options.selectColorTemperature3000,
+                Options.selectRed,
+                Options.selectGreen,
+                Options.selectBlue,
+                Options.selectWhite,
+                Options.selectBrightness,
             ],
             callback: async (action, context) => {
-                this.changeColorBrightness(action.options.delta)
+                console.log(
+                    'light > lightpower=' + action.options.power +
+                    ' / mode: ' + action.options.mode +
+                    ' / colorTemperature: ' + action.options.colorTemperature +
+                    ' / red: ' + action.options.red +
+                    ' / green: ' + action.options.green +
+                    ' / blue: ' + action.options.blue +
+                    ' / white: ' + action.options.white +
+                    ' / brightness: ' + action.options.brightness);
+                this.setColorLight(
+                    0,
+                    action.options.power,
+                    action.options.mode,
+                    action.options.colorTemperature,
+                    action.options.red,
+                    action.options.green,
+                    action.options.blue,
+                    action.options.white,
+                    action.options.brightness,
+                );
+            },
+            learn: (action) => {
+                const light = this.getColorLight(0);
+                //console.log('power=' + this.powerValue(light.power) + ' / mode: ' + light.mode + ' / colorTemperature: ' + light.colorTemperature + ' / brightness: ' + light.brightness);
+                return {
+                    power: this.powerValue(light.power),
+                    mode: light.mode,
+                    colorTemperature: light.colorTemperature,
+                    red: light.red,
+                    green: light.green,
+                    blue: light.blue,
+                    white: light.white,
+                    brightness: light.brightness,
+                }
             }
         },
-        setColor: {
-            name: 'Set color',
+        color: {
+            name: 'Color',
             options: [
                 {
                     type: 'number',
@@ -382,7 +254,7 @@ const backgroundColor = {
                     required: false,
                     range: true
                 },
-                {
+/*                {
                     type: 'number',
                     label: 'Gain (0-100 %)',
                     id: 'gain',
@@ -392,9 +264,21 @@ const backgroundColor = {
                     required: false,
                     range: true
                 },
-            ],
+*/            ],
             callback: async (action, context) => {
-                this.setColor(action.options.red, action.options.green, action.options.blue, action.options.white, action.options.gain);
+ /*               console.log(
+                    'red: ' + action.options.red +
+                    ' / green: ' + action.options.green +
+                    ' / blue: ' + action.options.blue +
+                    ' / white: ' + action.options.white
+                );
+*/                this.setColor(
+                    0,
+                    action.options.red,
+                    action.options.green,
+                    action.options.blue,
+                    action.options.white
+                    /*, action.options.gain*/);
             },
             learn: (action) => {
                 return {
@@ -402,17 +286,17 @@ const backgroundColor = {
                     green: this.lastStatus.lights[0].green,
                     blue: this.lastStatus.lights[0].blue,
                     white: this.lastStatus.lights[0].white,
-                    gain: this.lastStatus.lights[0].gain,
+                    //gain: this.lastStatus.lights[0].gain,
                 }
             }
         },
         changeColor: {
-            name: 'Increase/Decrease Color Channels (+32 to -32)',
+            name: 'Increase/Decrease Color Channels',
             options: [
                 {
                     type: 'number',
-                    label: 'Red +/- n',
-                    id: 'deltaRed',
+                    label: 'Red Delta',
+                    id: 'redDelta',
                     min: -32,
                     max: 32,
                     default: 17,
@@ -421,8 +305,8 @@ const backgroundColor = {
                 },
                 {
                     type: 'number',
-                    label: 'Green +/- n',
-                    id: 'deltaGreen',
+                    label: 'Green Delta',
+                    id: 'greenDelta',
                     min: -32,
                     max: 32,
                     default: 17,
@@ -431,8 +315,8 @@ const backgroundColor = {
                 },
                 {
                     type: 'number',
-                    label: 'Blue +/- n',
-                    id: 'deltaBlue',
+                    label: 'Blue Delta',
+                    id: 'blueDelta',
                     min: -32,
                     max: 32,
                     default: 17,
@@ -441,17 +325,17 @@ const backgroundColor = {
                 },
                 {
                     type: 'number',
-                    label: 'White +/- n',
-                    id: 'deltaWhite',
+                    label: 'White Delta',
+                    id: 'whiteDelta',
                     min: -32,
                     max: 32,
                     default: 17,
                     required: false,
                     range: true
                 },
-                {
+/*                {
                     type: 'number',
-                    label: 'Gain +/- n',
+                    label: 'Brightness Delta',
                     id: 'deltaGain',
                     min: 0,
                     max: 100,
@@ -459,12 +343,18 @@ const backgroundColor = {
                     required: false,
                     range: true
                 },
-            ],
+*/            ],
             callback: async (action, context) => {
-                this.changeColor(action.options.deltaRed, action.options.deltaGreen, action.options.deltaBlue, action.options.deltaWhite, action.options.deltaGain)
+                this.changeColor(
+                    0,
+                    action.options.redDelta,
+                    action.options.greenDelta,
+                    action.options.blueDelta,
+                    action.options.whiteDelta
+                    /*, action.options.deltaGain*/)
             }
         },
-        setEffect: {
+/*        setEffect: {
             name: 'Set Effect',
             options: [
                 {
@@ -490,133 +380,137 @@ const backgroundColor = {
                 }
             }
         },
-     }
-
-    static feedbacks = {
-        relayState: {
-            type: 'boolean',
-            name: 'Relay State',
-            description: "Current Shelly relay state",
-            options: [],
-            callback: async (feedback, context) => {
-                return this.getRelayState(0);
-            }
-        },
-        modeState: {
-            type: 'boolean',
-            name: 'Mode State',
-            description: "Currently configured mode",
-            options: [
-                {
-                    type: 'dropdown',
-                    label: 'Mode',
-                    id: 'mode',
-                    choices: [
-                        { id: 'white', label: 'white' },
-                        { id: 'color', label: 'color' },
-                    ],
-                    default: 'white'
-                }
-            ],
-            callback: async (feedback, context) => {
-                //console.log('getMode=' + this.getMode(0) + '  /  mode=' + feedback.options.mode);
-                return (this.getMode(0) == feedback.options.mode);
-            }
-        },
-        power: {
-            type: 'advanced',
-            name: 'Power',
-            description: 'Power',
-            options: [
-                {
-                    type: 'colorpicker',
-                    label: 'Foreground Color',
-                    id: 'onFg',
-                    default: ColorWhite
-                },
-                {
-                    type: 'colorpicker',
-                    label: 'Background Color',
-                    id: 'onBg',
-                    default: ColorGreen
-                }
-            ],
-            callback: async (feedback, context) => {
-                if (this.lastStatus == null) return { color: ColorWhite, bgcolor: ColorRed };
-                if (this.lastStatus.lights[0].ison) return { color: feedback.options.onFg, bgcolor: feedback.options.onBg };
-            }
-        },
-/*        power: {
-            type: 'advanced',
-            name: 'Power Status',
-            description: 'When light power status changes, change colors of the bank',
-            options: [selectPower, foregroundColor, backgroundColor],
-            callback: (feedback) => {
-*//*                const variable =
-                    feedback.feedbackId === 'power' ? this.data.variables.on : this.data.variables[feedback.feedbackId]
-                if (variable === undefined) {
-                    return
-                }
-                const currentValue = isFunction(variable.getValue)
-                    ? variable.getValue(this.data.status[feedback.feedbackId])
-                    : this.data.status[feedback.feedbackId]
-                const feedbackValue = isFunction(variable.getValue)
-                    ? variable.getValue(feedback.options[feedback.feedbackId])
-                    : feedback.options[feedback.feedbackId]
-                if (currentValue === feedbackValue) {
-*//*                    return { color: feedback.options.fg, bgcolor: feedback.options.bg }
-//                }
-            }
-        },
 */    }
+    static actions = {
+        ...ShellyDuo.actions,
+        ...this.duoRgbwActions
+    };
+
+    static duoRgbwFeedbacks = {
+        brightness: {
+            type: 'advanced',
+            name: 'Brightness',
+            description: 'When brightness changes, change colors of the bank',
+            options: [
+                Options.selectModeFeedbackAction,
+                Options.selectBrightnessLowFg, Options.selectBrightnessLowBg,
+                Options.selectBrightnessMiddleFg, Options.selectBrightnessMiddleBg,
+                Options.selectBrightnessHighFg, Options.selectBrightnessHighBg],
+            callback: (feedback, context) => {
+                let newMode;
+                if (feedback.options.mode == 'preselected') {
+                    newMode = preselectedMode;
+                } else {
+                    newMode = feedback.options.mode;
+                };
+                let currentBrightness;
+                switch (newMode) {
+                    case 'white': currentBrightness = this.getWhiteBrightness(0); break;
+                    case 'color': currentBrightness = this.getColorBrightness(0); break;
+                    default: currentBrightness = this.getBrightness(0);
+                }
+                if (currentBrightness < 25) {
+                    return { color: feedback.options.fgLowBrightness, bgcolor: feedback.options.bgLowBrightness }
+                } else if (currentBrightness > 75) {
+                    return { color: feedback.options.fgHighBrightness, bgcolor: feedback.options.bgHighBrightness }
+                } else {
+                    return { color: feedback.options.fgMiddleBrightness, bgcolor: feedback.options.bgMiddleBrightness }
+                }
+
+                return { color: feedback.options.fgMiddleBrightness, bgcolor: feedback.options.bgMiddleBrightness }
+            }
+        },
+   }
+    static feedbacks = {
+        ...ShellyDuo.feedbacks,
+        ...this.duoRgbwFeedbacks
+    }
 
     static variables() {
         let varList = [
-            //{ variableId: 'power', name: 'Power Status' },
+            { variableId: 'power', name: 'Power Status' },
+            { variableId: 'powerConsumption', name: 'Power Consumption' },
+            { variableId: 'totalPowerConsumption', name: 'Total Power Consumption' },
+            { variableId: 'brightness', name: 'Brightness' },
+            { variableId: 'colorTemperature', name: 'Color Temperature' },
+//            { variableId: 'light', name: 'Light' },
 
+            { variableId: 'mode', name: 'Configured Mode' },
+            { variableId: 'color', name: 'Color' },
+            { variableId: 'rgbColor', name: ' RGB Color' },
+            { variableId: 'whiteColor', name: 'White Color' },
+            //----
+            { variableId: 'preselectedMode', name: 'Preselected Mode' },
+            { variableId: 'whiteBrightness', name: 'White Brightness' },
+            { variableId: 'colorBrightness', name: 'Color Brightness' },
+
+            { variableId: 'red', name: 'Red Brightness' },
+            { variableId: 'green', name: 'Green Brightness' },
+            { variableId: 'blue', name: 'Blue Brightness' },
+            { variableId: 'white', name: 'White Brightness' },
+/*
             { variableId: 'relayState', name: 'Power State' },
             { variableId: 'powerConsumption', name: 'Power Consumption' },
             { variableId: 'totalPowerConsumption', name: 'Total Power Consumption' },
             { variableId: 'overPowerState', name: 'Over Power State' },
 
-            { variableId: 'brightness', name: 'Brightness' },
             { variableId: 'temp', name: 'Color Temperatur' },
 
-            { variableId: 'mode', name: 'Configured Mode' },
             { variableId: 'colorBrightness', name: 'Color Brightness' },
-            { variableId: 'color', name: ' Color' },
-            { variableId: 'red', name: 'Red Brightness' },
-            { variableId: 'green', name: 'Green Brightness' },
-            { variableId: 'blue', name: 'Blue Brightness' },
-            { variableId: 'white', name: 'White Brightness' },
             { variableId: 'effect', name: 'Currently applied effect' },
-        ];
+*/        ];
         return varList;
     }
 
     static updateVariables(instance) {
+        ShellyDuo.updateVariables(instance);
         instance.setVariableValues({
-            //'power': this.POWER_VALUES[this.lastStatus.lights[0].ison],
+            'mode': this.getColorMode(0),
+            'preselectedMode': preselectedMode,
+            'whiteBrightness': this.getWhiteBrightness(0),
+            'colorBrightness': this.getColorBrightness(0),
+            'brightness': this.getBrightness(0),
+            'light': this.lightText(this.getWhiteLight(0)),
 
-            'relayState': this.getRelayState(0),
+            'color': "#" + (1 << 24 | this.lastStatus.lights[0].red << 16 | this.lastStatus.lights[0].green << 8 | this.lastStatus.lights[0].blue).toString(16).slice(1) + 
+                (1 << 8 | this.lastStatus.lights[0].white).toString(16).slice(1),
+            'rgbColor': "#" + (1 << 24 | this.lastStatus.lights[0].red << 16 | this.lastStatus.lights[0].green << 8 | this.lastStatus.lights[0].blue).toString(16).slice(1),
+            'whiteColor': "#" + (1 << 24 | this.lastStatus.lights[0].red << 16 | this.lastStatus.lights[0].green << 8 | this.lastStatus.lights[0].blue).toString(16).slice(1),
+
+            'red': this.lastStatus.lights[0].red,
+            'green': this.lastStatus.lights[0].green,
+            'blue': this.lastStatus.lights[0].blue,
+            'white': this.lastStatus.lights[0].white,
+        })
+    }
+
+
+        
+/*
+            {
+//            ...this.updateVariables(instance),
+            //--------------------
+*//*            'preselectedMode': preselectedMode,
+            'whiteBrightness': this.getWhiteBrightness(0),
+            'colorBrightness': this.getColorBrightness(0),
+            'brightness': this.getBrightness(0),
+            'colorTemperature': this.getColorTemperature(),
+*//*
+*//*            'relayState': this.getRelayState(0),
             'powerConsumption': this.getPowerConsumption(0),
             'totalPowerConsumption': this.getTotalPowerConsumption(0),
             'overPowerState': this.getOverPowerState(0),
 
-            'brightness': this.getBrightness(0),
-            'temp': this.getTemp(0),
 
-            'mode': this.getMode(0),
-            'colorBrightness': this.getColorBrightness(0),
             'color': "#" + (1 << 24 | this.lastStatus.lights[0].red << 16 | this.lastStatus.lights[0].green << 8 | this.lastStatus.lights[0].blue).toString(16).slice(1),
             'red': this.lastStatus.lights[0].red,
             'green': this.lastStatus.lights[0].green,
             'blue': this.lastStatus.lights[0].blue,
             'white': this.lastStatus.lights[0].white,
             'effect': this.getEffect(0),
-        })
+*//*        })
     }
-
+ */
 
 
     /*
@@ -784,7 +678,7 @@ const backgroundColor = {
             description: "Change the button text to the current mode value",
             options: [],
             callback: async (feedback, context) => {
-                const currentMode = ShellyLight.getMode(0);
+                const currentMode = ShellyLight.getColorMode(0);
                 return { text: currentMode }
             }
         },
@@ -884,5 +778,3 @@ const backgroundColor = {
     }
 */
 }
-
-export { ShellyDuoRGBW };

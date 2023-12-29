@@ -43,7 +43,7 @@ export const configFields = [
 			{ id: 105, label: 'Shelly RGBW2 (Color Mode)' },
 			{ id: 106, label: 'Shelly RGBW2 (White Mode)' },
 			{ id: 107, label: 'Shelly Duo' },
-			{ id: 108, label: 'Shelly Duo RGBW' }
+			{ id: 108, label: 'Shelly Duo RGBW' },
 		],
 	},
 ]

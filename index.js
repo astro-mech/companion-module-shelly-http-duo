@@ -1,15 +1,15 @@
+import got from 'got'
 import { InstanceBase, runEntrypoint, InstanceStatus } from '@companion-module/base'
 import { configFields } from './config.js'
 import { upgradeScripts } from './upgrade.js'
+import { ShellyMaster } from './shellyProducts/shellyMaster.js'
 import { Shelly1 } from './shellyProducts/shelly1.js';
 import { ShellyRGBW2Color } from './shellyProducts/shellyRGBW2.js';
 import { ShellyRGBW2White } from './shellyProducts/shellyRGBW2.js';
 import { ShellyDimmer } from './shellyProducts/shellyDimmer.js';
 import { Shelly25Relay, Shelly25Roller } from './shellyProducts/shelly25.js';
 import { ShellyDuo } from './shellyProducts/shellyDuo.js'
-import { ShellyDuoRGBW } from './shellyProducts/shellyDuoRGBW.js'
-import { ShellyMaster } from './shellyProducts/shellyMaster.js'
-import got from 'got'
+import { ShellyDuoRGBW } from './shellyProducts/ShellyDuoRGBW.js'
 
 class ShellyInstance extends InstanceBase {
 
@@ -109,8 +109,8 @@ class ShellyInstance extends InstanceBase {
 
 	initPresets(product) {
 		switch (this.config.shellyProduct) {
-			case 107: this.setPresetDefinitions(ShellyDuo.presets());
-			case 108: this.setPresetDefinitions(ShellyDuo.presets());
+//			case 107: this.setPresetDefinitions(ShellyDuo.presets());
+//			case 108: this.setPresetDefinitions(ShellyDuo.presets());
 		}
 	}
 
