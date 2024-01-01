@@ -9,26 +9,32 @@ export var Options = {
 		label: 'Power Status',
 		id: 'power',
 		default: 'on',
-		choices: POWER_VALUES.map((label) => ({ id: label, label })),
+		choices: POWER_VALUES.map((label) => ({ id: label, label }))
 	},
 	selectPowerAction:  {
 		type: 'dropdown',
 		label: 'Power Action',
 		id: 'powerAction',
 		default: POWER_ACTIONS[2],
-		choices: POWER_ACTIONS.map((label) => ({ id: label, label })),
+		choices: POWER_ACTIONS.map((label) => ({ id: label, label }))
+	},
+	textInput: {
+		type: 'textinput',
+		label: 'Text',
+		id: 'text',
+		default: ''
 	},
 	foregroundColor:  {
 		type: 'colorpicker',
 		label: 'Foreground color',
 		id: 'fg',
-		default: Colors.white,
+		default: Colors.white
 	},
 	backgroundColor:  {
 		type: 'colorpicker',
 		label: 'Background color',
 		id: 'bg',
-		default: Colors.green,
+		default: Colors.green
 	},
 	selectBrightness:  {
 		type: 'number',
@@ -70,108 +76,77 @@ export var Options = {
 		required: true,
 		range: true
 	},
-/*	selectWhite100: {
-		type: 'number',
-		label: 'White [%]',
-		id: 'white',
-		min: 0,
-		max: 100,
-		default: 50,
-		required: true,
-		range: true
-	},
-	selectWhite255: {
-		type: 'number',
-		label: 'White',
-		id: 'white',
-		min: 0,
-		max: 255,
-		default: 127,
-		required: true,
-		range: true
-	},
-	selectWhiteDelta: {
-		type: 'number',
-		label: 'White Delta [%]',
-		id: 'whiteDelta',
-		min: -25,
-		max: 25,
-		default: 5,
-		required: true,
-		range: true
-	},
-*/
 	selectBrightnessLowFg: {
 		type: 'colorpicker',
-		label: 'Foreground Color Brightness Level Low < 25 %',
+		label: 'Foreground Color Brightness Level Low < 25 [%]',
 		id: 'fgLowBrightness',
-		default: Colors.white,
+		default: Colors.white
 	},
 	selectBrightnessLowBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Brightness Level Low < 25 %',
+		label: 'Background Color Brightness Level Low < 25 [%]',
 		id: 'bgLowBrightness',
-		default: 0x222222,
+		default: 0x222222
 	},
 	selectBrightnessMiddleFg:  {
 		type: 'colorpicker',
-		label: 'Foreground Color Brightness Level Middle < 25 %',
+		label: 'Foreground Color Brightness Level Middle 25 >= x <= 75 [%]',
 		id: 'fgMiddleBrightness',
-		default: Colors.white,
+		default: Colors.white
 	},
 	selectBrightnessMiddleBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Brightness Level Middle < 25 %',
+		label: 'Background Color Brightness Level Middle 25 >= x <= 75 [%]',
 		id: 'bgMiddleBrightness',
-		default: 0x999999,
+		default: 0x999999
 	},
 	selectBrightnessHighFg:  {
 		type: 'colorpicker',
-		label: 'Foreground Color Brightness Level High < 25 %',
+		label: 'Foreground Color Brightness Level High > 75 [%]',
 		id: 'fgHighBrightness',
-		default: Colors.black,
+		default: Colors.black
 	},
 	selectBrightnessHighBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Brightness Level High < 25 %',
+		label: 'Background Color Brightness Level High > 75 [%]',
 		id: 'bgHighBrightness',
-		default: 0xdddddd,
+		default: 0xdddddd
 	},
 	colorTempWarmWhiteFg:  {
 		type: 'colorpicker',
-		label: 'Foreground Color Warm White < 3300 K',
+		label: 'Foreground Color Warm White < 3300 [K]',
 		id: 'fgWarmWhite',
-		default: Colors.black,
+		default: Colors.black
 	},
 	colorTempWarmWhiteBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Warm White < 3300 K',
+		label: 'Background Color Warm White < 3300 [K]',
 		id: 'bgWarmWhite',
-		default: Colors.warmWhite, //combineRgb(255, 204, 26), //red 100%, green 80%, blue 10%.
+		default: Colors.warmWhite
 	},
 	colorTempNeutralWhiteFg:  {
 		type: 'colorpicker',
-		label: 'Foreground Color Neutral White 3300 - 5300 K',
+		label: 'Foreground Color Neutral White 3300 >= x <= 5300 [K]',
 		id: 'fgNeutralWhite',
-		default: Colors.black,
+		default: Colors.black
 	},
 	colorTempNeutralWhiteBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Neutral White 3300 - 5300 K',
+		label: 'Background Color Neutral White 3300 >= x <= 5300 [K]',
 		id: 'bgNeutralWhite',
-		default: Colors.neutralWhite,
+		default: Colors.neutralWhite
 	},
 	colorTempColdWhiteFg:  {
 		type: 'colorpicker',
-		label: 'Foreground Color Cold White > 5300 K',
+		label: 'Foreground Color Cold White > 5300 [K]',
 		id: 'fgColdWhite',
-		default: Colors.black,
+		default: Colors.black
 	},
 	colorTempColdWhiteBg:  {
 		type: 'colorpicker',
-		label: 'Background Color Cold White > 5300 K',
+		label: 'Background Color Cold White > 5300 [K]',
 		id: 'bgColdWhite',
-		default: Colors.coldWhite,
+		default: Colors.coldWhite
 	},
 }
 
@@ -179,13 +154,12 @@ export class ShellyDuo extends ShellyLight {
 	static powerValue(powerState) {
 		return POWER_VALUES[(powerState == true) ? 1 : 0]
 	}
-
 	static actions = {
 		power: {
 			name: 'Power',
 			options: [Options.selectPowerAction],
 			callback: async (action, context) => {
-				this.setPowerState(0, action.options.powerAction)
+				this.setPowerState(0, action.options.powerAction);
 			}
 		},
 		brightness: {
@@ -211,7 +185,7 @@ export class ShellyDuo extends ShellyLight {
 			name: 'Color Temperature',
 			options: [Options.selectColorTemperature2700],
 			callback: async (action, context) => {
-				this.setColorTemperature(0, action.options.colorTemperature)
+				this.setColorTemperature(0, action.options.colorTemperature);
 			},
 			learn: (action) => {
 				return {
@@ -223,35 +197,40 @@ export class ShellyDuo extends ShellyLight {
 			name: 'Increase/Decrease Color Temperature',
 			options: [Options.selectColorTemperatureDelta],
 			callback: async (action, context) => {
-				this.changeColorTemperature(0, action.options.delta, 2700, 6500)
+				this.changeColorTemperature(0, action.options.colorTempDelta, 2700, 6500);
 			}
 		},
 		light: {
 			name: 'Light',
-			options: [Options.selectPower, Options.selectColorTemperature2700, Options.selectBrightness],
+			options: [
+				Options.selectPower,
+				Options.selectColorTemperature2700,
+				Options.selectBrightness],
 			callback: async (action, context) => {
-				this.setWhiteLight(0, action.options.power, action.options.colorTemperature, action.options.brightness);
+				this.setWhiteLight(0,
+					action.options.power,
+					action.options.colorTemperature,
+					action.options.brightness);
 			},
 			learn: (action) => {
 				const light = this.getWhiteLight(0);
 				return {
 					power: light.power,
 					colorTemperature: light.colorTemperature,
-					brightness: light.brightness,
+					brightness: light.brightness
 				}
 			}
-		},
+		}
 	}
 	static feedbacks = {
 		power: {
 			type: 'advanced',
 			name: 'Power Status',
 			description: 'When light power status changes, change colors of the bank',
-			options: [Options.selectPower, Options.foregroundColor, Options.backgroundColor],
+			options: [Options.selectPower, Options.textInput, Options.foregroundColor, Options.backgroundColor],
 			callback: (feedback, context) => {
-				//console.log(feedback.options.power + " / " + this.getPowerState(0) + " / " + this.powerValue(this.getPowerState(0)));
 				if (feedback.options.power == this.powerValue(this.getPowerState(0))) {
-					return { color: feedback.options.fg, bgcolor: feedback.options.bg }
+					return { text: feedback.options.text, color: feedback.options.fg, bgcolor: feedback.options.bg };
 				}
 			}
 		},
@@ -265,11 +244,20 @@ export class ShellyDuo extends ShellyLight {
 				Options.selectBrightnessHighFg, Options.selectBrightnessHighBg],
 			callback: (feedback, context) => {
 				if (this.getWhiteBrightness(0) < 25) {
-					return { color: feedback.options.fgLowBrightness, bgcolor: feedback.options.bgLowBrightness }
+					return {
+						color: feedback.options.fgLowBrightness,
+						bgcolor: feedback.options.bgLowBrightness
+					}
 				} else if (this.getWhiteBrightness(0) > 75) {
-					return { color: feedback.options.fgHighBrightness, bgcolor: feedback.options.bgHighBrightness }
+					return {
+						color: feedback.options.fgHighBrightness,
+						bgcolor: feedback.options.bgHighBrightness
+					}
 				} else {
-					return { color: feedback.options.fgMiddleBrightness, bgcolor: feedback.options.bgMiddleBrightness }
+					return {
+						color: feedback.options.fgMiddleBrightness,
+						bgcolor: feedback.options.bgMiddleBrightness
+					}
 				}
 			}
 		},
@@ -283,12 +271,30 @@ export class ShellyDuo extends ShellyLight {
 				Options.colorTempColdWhiteFg, Options.colorTempColdWhiteBg],
 			callback: (feedback, context) => {
 				if (this.getColorTemperature(0) < 3300) {
-					return { color: feedback.options.fgWarmWhite, bgcolor: feedback.options.bgWarmWhite }
+					return {
+						color: feedback.options.fgWarmWhite,
+						bgcolor: feedback.options.bgWarmWhite
+					}
 				} else if (this.getColorTemperature(0) > 5300) {
-					return { color: feedback.options.fgColdWhite, bgcolor: feedback.options.bgColdWhite }
+					return {
+						color: feedback.options.fgColdWhite,
+						bgcolor: feedback.options.bgColdWhite
+					}
 				} else {
-					return { color: feedback.options.fgNeutralWhite, bgcolor: feedback.options.bgNeutralWhite }
+					return {
+						color: feedback.options.fgNeutralWhite,
+						bgcolor: feedback.options.bgNeutralWhite
+					}
 				}
+			}
+		},
+		light: {
+			type: 'static-text',
+			name: 'Light Info',
+			description: 'Change text of the bank to the current light values',
+			options: [],
+			callback: (feedback, context) => {
+				return 'duo=' + this.lightText();
 			}
 		},
 	}
@@ -303,18 +309,13 @@ export class ShellyDuo extends ShellyLight {
 		];
 		return varList;
 	}
-	static lightText(light) {
-		//console.log(light.power + ' / ' + light.colorTemperature + ' / ' + light.brightness);
-		return light.power + ', ' + light.colorTemperature + ' K, ' + light.brightness + ' %';
-	}
 	static updateVariables(instance) {
 		instance.setVariableValues({
 			'power': this.powerValue(this.getPowerState(0)),
 			'powerConsumption': this.getPowerConsumption(0),
 			'totalPowerConsumption': this.getTotalPowerConsumption(0),
 			'brightness': this.getWhiteBrightness(0),
-			'colorTemperature': this.getColorTemperature(0),
-			'light': this.lightText(this.getWhiteLight(0)),
+			'colorTemperature': this.getColorTemperature(0)
 		})
 	}
 

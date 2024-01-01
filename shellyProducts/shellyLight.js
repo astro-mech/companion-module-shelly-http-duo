@@ -15,7 +15,6 @@ export const Colors = {
     coldWhite: 0xE3E4ED,
 }
 
-
 export class ShellyLight extends ShellyMaster {
     /*  Attributes:
         ison 	    bool 	Whether the channel is turned ON or OFF
@@ -34,28 +33,33 @@ export class ShellyLight extends ShellyMaster {
         gain 	    number 	Gain for all channels, 0..100, applies in mode="color"
         effect 	    number 	Currently applied effect, description
     */
+
+    // Helper functions
+    static valueInRange(value, minValue, maxValue) {
+        return Math.max(Math.min(value, maxValue), minValue);
+    }
+
    // Power getter and setter
     static getPowerState(channelNumber) {
         if (this.lastStatus == null) return null;
-        return this.lastStatus.lights[0].ison;
+        return this.lastStatus.lights[channelNumber].ison;
     }
     static async setPowerState(channelNumber, action) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?turn=" + action, null)
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?turn=" + action,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
     static getPowerConsumption(channelNumber) {
         if (this.lastStatus == null) return null;
-        return this.lastStatus.meters[0].power;
+        return this.lastStatus.meters[channelNumber].power;
     }
     static getTotalPowerConsumption(channelNumber) {
         if (this.lastStatus == null) return null;
-        return (this.lastStatus.meters[0].total / 60).toFixed(2);
-    }
-
-    // Helper functions
-    static valueInRange(value, minValue, maxValue) {
-        return Math.max(Math.min(value, maxValue), minValue)
+        return (this.lastStatus.meters[channelNumber].total / 60).toFixed(2);
     }
 
     // Brightness, color temperature and light getter and setter (white bulbs)
@@ -64,14 +68,25 @@ export class ShellyLight extends ShellyMaster {
         return this.lastStatus.lights[channelNumber].brightness;
     }
     static async setWhiteBrightness(channelNumber, brightness) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?brightness=" + brightness, null)
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?brightness=" + brightness,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
     static async changeWhiteBrightness(channelNumber, delta) {
         if (this.lastStatus == null) return false;
-        let newBrightness = this.valueInRange(this.lastStatus.lights[channelNumber].brightness + delta, 0, 100);
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?brightness=" + newBrightness, null)
+        let newBrightness = this.valueInRange(
+            this.lastStatus.lights[channelNumber].brightness + delta,
+            0,
+            100);
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?brightness=" + newBrightness,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
@@ -80,14 +95,25 @@ export class ShellyLight extends ShellyMaster {
         return this.lastStatus.lights[channelNumber].temp;
     }
     static async setColorTemperature(channelNumber, colorTemperature) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?temp=" + colorTemperature, null)
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?temp=" + colorTemperature,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
     static async changeColorTemperature(channelNumber, delta, minColorTemp, maxColorTemp) {
         if (this.lastStatus == null) return false;
-        let newColorTemp = this.valueInRange(this.lastStatus.lights[channelNumber].temp + delta, minColorTemp, maxColorTemp);
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?temp=" + newColorTemp, null)
+        let newColorTemp = this.valueInRange(
+            this.lastStatus.lights[channelNumber].temp + delta,
+            minColorTemp,
+            maxColorTemp);
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?temp=" + newColorTemp,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
@@ -98,16 +124,18 @@ export class ShellyLight extends ShellyMaster {
         return {
             power: this.getPowerState(channelNumber),
             colorTemperature: this.getColorTemperature(channelNumber),
-            brightness: this.getWhiteBrightness(channelNumber),
+            brightness: this.getWhiteBrightness(channelNumber)
         }
     }
     static async setWhiteLight(channelNumber, power, colorTemperature, brightness) {
-        const response = await got.get("http://" + this.targetIp +
+        const response = await got.get(
+            "http://" + this.targetIp +
             "/light/" + channelNumber +
             "?turn=" + power +
-            "&temp=" + ((colorTemperature != '') ? colorTemperature : this.getColorTemperature(channelNumber)) +
-            "&brightness=" + ((brightness != '') ? brightness : this.getBrightness(channelNumber))
-            , null)
+            "&temp=" +
+                ((colorTemperature != '') ? colorTemperature : this.getColorTemperature(channelNumber)) +
+            "&brightness=" + ((brightness != '') ? brightness : this.getBrightness(channelNumber)),
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
@@ -121,14 +149,18 @@ export class ShellyLight extends ShellyMaster {
         let newMode;
         if (mode == 'toggle') {
             if (this.getColorMode(channelNumber) == 'white') {
-                newMode = 'color'
+                newMode = 'color';
             } else {
-                newMode = 'white'
+                newMode = 'white';
             }
         } else {
-            newMode = mode
+            newMode = mode;
         }
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?mode=" + newMode, null)
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?mode=" + newMode,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
@@ -137,39 +169,46 @@ export class ShellyLight extends ShellyMaster {
         return this.lastStatus.lights[channelNumber].gain;
     }
     static async setColorBrightness(channelNumber, brightness) {
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?gain=" + brightness, null)
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?gain=" + brightness, null);
         if (response.statusCode == 200) return true;
         else return false;
     }
     static async changeColorBrightness(channelNumber, delta) {
         if (this.lastStatus == null) return false;
-        const newGain = Math.max(Math.min(this.lastStatus.lights[0].gain + delta, 100), 0);
-        const response = await got.get("http://" + this.targetIp + "/light/" + channelNumber + "?gain=" + newGain, null)
+        const newGain = this.valueInRange(this.lastStatus.lights[0].gain + delta, 0, 100);
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?gain=" + newGain,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
     static getBrightness(channelNumber) {
-        if (this.lastStatus == null) return false;
+        if (this.lastStatus == null) return null;
         if (this.getColorMode(channelNumber) == 'color') {
-            return this.getColorBrightness(channelNumber)
+            return this.getColorBrightness(channelNumber);
         } else {
-            return this.getWhiteBrightness(channelNumber)
+            return this.getWhiteBrightness(channelNumber);
         }
     }
     static async setBrightness(channelNumber, brightness) {
         if (this.lastStatus == null) return false;
         if (this.getColorMode(channelNumber) == 'color') {
-            return this.setColorBrightness(channelNumber, brightness)
+            return this.setColorBrightness(channelNumber, brightness);
         } else {
-            return this.setWhiteBrightness(channelNumber, brightness)
+            return this.setWhiteBrightness(channelNumber, brightness);
         }
     }
     static async changeBrightness(channelNumber, delta) {
         if (this.lastStatus == null) return false;
         if (this.getColorMode(channelNumber) == 'color') {
-            return this.changeColorBrightness(channelNumber, delta)
+            return this.changeColorBrightness(channelNumber, delta);
         } else {
-            return this.changeWhiteBrightness(channelNumber, delta)
+            return this.changeWhiteBrightness(channelNumber, delta);
         }
     }
 
@@ -180,26 +219,52 @@ export class ShellyLight extends ShellyMaster {
             red: this.lastStatus.lights[channelNumber].red,
             green: this.lastStatus.lights[channelNumber].green,
             blue: this.lastStatus.lights[channelNumber].blue,
-            white: this.lastStatus.lights[channelNumber].white,
-            //brightness: this.lastStatus.lights[channelNumber].brightness,
+            white: this.lastStatus.lights[channelNumber].white
         }
     }
-    static async setColor(channelNumber, red, green, blue, white/*, gain*/) {
-        const response = await got.get("http://" + this.targetIp + "/color/" + channelNumber + "?red=" + red + "&green=" + green + "&blue=" + blue + "&white=" + white/* + "&gain=" + gain*/, null)
+    static async setColor(channelNumber, red, green, blue, white) {
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/color/" + channelNumber +
+            "?red=" + red +
+            "&green=" + green +
+            "&blue=" + blue +
+            "&white=" + white,
+            null);
         if (response.statusCode == 200) return true;
         else return false;
     }
-    static async changeColor(channelNumber, deltaRed, deltaGreen, deltaBlue, deltaWhite/*, deltaGain*/) {
+    static async changeColor(channelNumber, deltaRed, deltaGreen, deltaBlue, deltaWhite) {
         if (this.lastStatus == null) return false;
-        const red = Math.max(Math.min(this.lastStatus.lights[channelNumber].red + deltaRed, 255), 0);
-        const green = Math.max(Math.min(this.lastStatus.lights[channelNumber].green + deltaGreen, 255), 0);
-        const blue = Math.max(Math.min(this.lastStatus.lights[channelNumber].blue + deltaBlue, 255), 0);
-        const white = Math.max(Math.min(this.lastStatus.lights[channelNumber].white + deltaWhite, 255), 0);
-        //const gain = Math.max(Math.min(this.lastStatus.lights[channelNumber].gain + deltaGain, 100), 0);
-        const response = await got.get("http://" + this.targetIp + "/color/" + channelNumber + "?red=" + red + "&green=" + green + "&blue=" + blue + "&white=" + white/* + "&gain=" + gain*/, null)
+        const red = this.valueInRange(this.lastStatus.lights[channelNumber].red + deltaRed, 0, 255);
+        const green = this.valueInRange(this.lastStatus.lights[channelNumber].green + deltaGreen, 0, 255);
+        const blue = this.valueInRange(this.lastStatus.lights[channelNumber].blue + deltaBlue, 0, 255);
+        const white = this.valueInRange(this.lastStatus.lights[channelNumber].white + deltaWhite, 0, 255);
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/color/" + channelNumber +
+            "?red=" + red +
+            "&green=" + green +
+            "&blue=" + blue +
+            "&white=" + white,
+            null)
         if (response.statusCode == 200) return true;
         else return false;
     }
+
+    // Efect getter and setter
+    static getEffect(channelNumber) {
+        if (this.lastStatus == null) return null;
+        return this.lastStatus.lights[0].effect;
+    }
+    static async setEffect(channelNumber, effect) {
+        const response = await got.get(
+            "http://" + this.targetIp +
+            "/light/" + channelNumber +
+            "?effect=" + effect,
+            null);
+        if (response.statusCode == 200) return true;
+        else return false;    }
 
     // Light getter and setter (color bulbs)
     static getColorLight(channelNumber) {
@@ -216,41 +281,23 @@ export class ShellyLight extends ShellyMaster {
             brightness: this.getBrightness(channelNumber),
         }
     }
-    static async setColorLight(channelNumber, power, mode, colorTemperature, red, green, blue, white, brightness) {
-        console.log(
-            'getColorLight() > lightpower=' + power +
-            ' / mode: ' + mode +
-            ' / colorTemperature: ' + colorTemperature +
-            ' / red: ' + red +
-            ' / green: ' + green +
-            ' / blue: ' + blue +
-            ' / white: ' + white +
-            ' / brightness: ' + brightness);
+    static async setColorLight(
+            channelNumber, power, mode, colorTemperature, red, green, blue, white, brightness) {
         const feedUrl =
             "http://" + this.targetIp +
             "/light/" + channelNumber +
             "?turn=" + power +
             "&mode=" + mode +
-            "&temp=" + ((colorTemperature >= 0) ? colorTemperature : this.getColorTemperature(channelNumber)) +
+            "&temp=" +
+                ((colorTemperature >= 0) ? colorTemperature : this.getColorTemperature(channelNumber)) +
             "&red=" + ((red >= 0) ? red : this.getColor(channelNumber).red) +
             "&green=" + ((green >= 0) ? green : this.getColor(channelNumber).green) +
             "&blue=" + ((blue >= 0) ? blue : this.getColor(channelNumber).blue) +
             "&white=" + ((white >= 0) ? white : this.getColor(channelNumber).white) +
             "&brightness=" + ((brightness >= 0) ? brightness : this.getBrightness(channelNumber));
-        console.log('feedUrl > ' + feedUrl);
+        //console.log('feedUrl > ' + feedUrl);
         const response = await got.get(feedUrl, null);
-        console.log(
-            'getColorLight() > lightpower=' + power +
-            ' / mode: ' + mode +
-            ' / colorTemperature: ' + colorTemperature +
-            ' / red: ' + red +
-            ' / green: ' + green +
-            ' / blue: ' + blue +
-            ' / white: ' + white +
-            ' / brightness: ' + brightness +
-            ' / response: ' + response.statusCode);
         if (response.statusCode == 200) return true;
         else return false;
     }
-
 }

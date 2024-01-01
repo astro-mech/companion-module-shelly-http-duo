@@ -1,6 +1,6 @@
 {
 	"name": "shelly-http",
-	"version": "1.1.0.b3",
+	"version": "1.1.0.b4",
 	"main": "index.js",
 	"type": "module",
 	"scripts": {

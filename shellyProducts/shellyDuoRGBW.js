@@ -23,7 +23,7 @@ import { ShellyDuo, Options  } from './ShellyDuo.js'
 }
 */
 
-const MODE_VALUES = ['white', 'color', 'current']
+const MODE_VALUES = ['white', 'color']
 const MODE_SELECTION = ['white', 'color', 'toggle']
 const MODE_ACTIONS = ['white', 'color', 'current', 'all', 'preselected']
 const MODE_FEEDBACK_ACTIONS = ['white', 'color', 'current', 'preselected']
@@ -39,7 +39,7 @@ Options.selectSetMode = {
     type: 'dropdown',
     label: 'Mode',
     id: 'mode',
-    default: MODE_SELECTION[1],
+    default: MODE_SELECTION[2],
     choices: MODE_SELECTION.map((label) => ({ id: label, label })),
 }
 Options.selectModeAction = {
@@ -106,6 +106,18 @@ Options.selectWhite = {
     required: true,
     range: true,
 }
+Options.selectEffect = {
+    type: 'dropdown',
+    label: 'Effect',
+    id: 'effect',
+    choices: [
+        { id: '0', label: '0 - Off' },
+        { id: '1', label: '1 - Meteor Shower' },
+        { id: '2', label: '2 - Gradual Change' },
+        { id: '3', label: '3 - Flash' },
+    ],
+    default: 0,
+}
 
 export class ShellyDuoRGBW extends ShellyDuo {
     
@@ -162,6 +174,25 @@ export class ShellyDuoRGBW extends ShellyDuo {
                 }
             }
         },
+        colorTemperature: {
+            name: 'Color Temperature',
+            options: [Options.selectColorTemperature3000],
+            callback: async (action, context) => {
+                this.setColorTemperature(0, action.options.colorTemperature);
+            },
+            learn: (action) => {
+                return {
+                    colorTemperature: this.getColorTemperature(0)
+                }
+            }
+        },
+        colorTemperatureChange: {
+            name: 'Increase/Decrease Color Temperature',
+            options: [Options.selectColorTemperatureDelta],
+            callback: async (action, context) => {
+                this.changeColorTemperature(0, action.options.delta, 3000, 6500);
+            }
+        },
         light: {
             name: 'Light',
             options: [
@@ -172,18 +203,9 @@ export class ShellyDuoRGBW extends ShellyDuo {
                 Options.selectGreen,
                 Options.selectBlue,
                 Options.selectWhite,
-                Options.selectBrightness,
+                Options.selectBrightness
             ],
             callback: async (action, context) => {
-                console.log(
-                    'light > lightpower=' + action.options.power +
-                    ' / mode: ' + action.options.mode +
-                    ' / colorTemperature: ' + action.options.colorTemperature +
-                    ' / red: ' + action.options.red +
-                    ' / green: ' + action.options.green +
-                    ' / blue: ' + action.options.blue +
-                    ' / white: ' + action.options.white +
-                    ' / brightness: ' + action.options.brightness);
                 this.setColorLight(
                     0,
                     action.options.power,
@@ -354,33 +376,19 @@ export class ShellyDuoRGBW extends ShellyDuo {
                     /*, action.options.deltaGain*/)
             }
         },
-/*        setEffect: {
-            name: 'Set Effect',
-            options: [
-                {
-                    type: 'dropdown',
-                    label: 'Effect',
-                    id: 'effect',
-                    choices: [
-                        { id: '0', label: '0 - Off' },
-                        { id: '1', label: '1 - Meteor Shower' },
-                        { id: '2', label: '2 - Gradual Change' },
-                        { id: '3', label: '3 - Flash' },
-                    ],
-                    default: 0,
-                    required: true
-                }
-            ],
+        effect: {
+            name: 'Effect',
+            options: [Options.selectEffect],
             callback: async (action, context) => {
-                this.setEffect(action.options.effect)
+                this.setEffect(0, action.options.effect)
             },
             learn: (action) => {
                 return {
-                    effect: this.lastStatus.lights[0].effect
+                    effect: this.getEffect(channelNumber)
                 }
             }
         },
-*/    }
+    }
     static actions = {
         ...ShellyDuo.actions,
         ...this.duoRgbwActions
@@ -420,6 +428,19 @@ export class ShellyDuoRGBW extends ShellyDuo {
                 return { color: feedback.options.fgMiddleBrightness, bgcolor: feedback.options.bgMiddleBrightness }
             }
         },
+        mode: {
+            type: 'advanced',
+            name: 'Mode',
+            description: 'When mode changes, change colors of the bank',
+            options: [
+                Options.selectMode,
+                Options.foregroundColor, Options.backgroundColor],
+            callback: (feedback, context) => {
+                if (feedback.options.mode == this.getColorMode) {
+                    return { color: feedback.options.fg, bgcolor: feedback.options.bg };
+                }
+            }
+        },
    }
     static feedbacks = {
         ...ShellyDuo.feedbacks,
@@ -433,7 +454,6 @@ export class ShellyDuoRGBW extends ShellyDuo {
             { variableId: 'totalPowerConsumption', name: 'Total Power Consumption' },
             { variableId: 'brightness', name: 'Brightness' },
             { variableId: 'colorTemperature', name: 'Color Temperature' },
-//            { variableId: 'light', name: 'Light' },
 
             { variableId: 'mode', name: 'Configured Mode' },
             { variableId: 'color', name: 'Color' },
@@ -448,17 +468,8 @@ export class ShellyDuoRGBW extends ShellyDuo {
             { variableId: 'green', name: 'Green Brightness' },
             { variableId: 'blue', name: 'Blue Brightness' },
             { variableId: 'white', name: 'White Brightness' },
-/*
-            { variableId: 'relayState', name: 'Power State' },
-            { variableId: 'powerConsumption', name: 'Power Consumption' },
-            { variableId: 'totalPowerConsumption', name: 'Total Power Consumption' },
-            { variableId: 'overPowerState', name: 'Over Power State' },
-
-            { variableId: 'temp', name: 'Color Temperatur' },
-
-            { variableId: 'colorBrightness', name: 'Color Brightness' },
             { variableId: 'effect', name: 'Currently applied effect' },
-*/        ];
+        ];
         return varList;
     }
 
@@ -470,7 +481,6 @@ export class ShellyDuoRGBW extends ShellyDuo {
             'whiteBrightness': this.getWhiteBrightness(0),
             'colorBrightness': this.getColorBrightness(0),
             'brightness': this.getBrightness(0),
-            'light': this.lightText(this.getWhiteLight(0)),
 
             'color': "#" + (1 << 24 | this.lastStatus.lights[0].red << 16 | this.lastStatus.lights[0].green << 8 | this.lastStatus.lights[0].blue).toString(16).slice(1) + 
                 (1 << 8 | this.lastStatus.lights[0].white).toString(16).slice(1),
@@ -481,6 +491,7 @@ export class ShellyDuoRGBW extends ShellyDuo {
             'green': this.lastStatus.lights[0].green,
             'blue': this.lastStatus.lights[0].blue,
             'white': this.lastStatus.lights[0].white,
+            'effect': this.getEffect(0),
         })
     }
 

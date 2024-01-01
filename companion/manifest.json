@@ -3,7 +3,7 @@
 	"name": "shelly-http",
 	"shortname": "shelly",
 	"description": "shelly",
-	"version": "1.1.0.b2",
+	"version": "1.1.0.b4",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-shelly-http.git",
 	"bugs": "https://github.com/bitfocus/companion-module-shelly-http/issues",
@@ -30,7 +30,8 @@
 		"2.5",
 		"Dimmer1/2",
 		"RGBW2",
-		"Duo"
+		"Duo",
+		"Duo RGBW"
 	],
 	"keywords": [
 		"Shelly",
